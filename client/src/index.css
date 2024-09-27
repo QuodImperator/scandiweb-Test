@@ -1,3 +1,4 @@
+/* Header */
 ul {
   list-style-type: none;
   margin: 0;
@@ -34,7 +35,7 @@ li a:hover {
 .logo {
   position: absolute;
   top: 20px;
-  left: 50%;
+  left: 900px;
 }
 
 .cart {
@@ -42,3 +43,119 @@ li a:hover {
   top: 30px;
   left: 90%;
 }
+
+ul li a.active {
+  color: rgb(0, 255, 0);
+  border-bottom: 2px solid rgb(0, 255, 0);
+}
+/* Header */
+
+.category-display {
+  margin-top: 60px;
+  margin-left: 100px
+}
+
+.category-display h1 {
+  font-size: 36px;
+  color: black;
+  text-align: left;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 200;
+}
+
+/* Products */
+.product-container {
+  width: 1600px;
+  margin: 0 auto;
+  padding-left: 52px
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 16px;
+  transition: box-shadow 0.3s ease;
+  width: 400px;
+  height: 450px;
+  box-sizing: border-box;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 35px rgba(168, 172, 176, 0.19);
+}
+
+.product-image {
+  width: 100%;
+  height: 80%;
+  object-fit: cover;
+}
+
+.product-name {
+  font-size: 18px;
+  font-weight: 300;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.product-price {
+  font-weight: 500;
+  margin: 5px 0 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.out-of-stock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80%;
+  background-color: rgba(226, 226, 226, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 200;
+  font-size: x-large;
+  z-index: 10;
+}
+
+.out-of-stock {
+  z-index: 20;
+}
+
+.add-to-cart {
+  position: absolute;
+  bottom: 72px;
+  right: 31px;
+  background-color: #5ECE7B;
+  border: none;
+  color: white;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 11px rgba(29, 31, 34, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.product-card:hover .add-to-cart {
+  opacity: 1;
+}
+
+.cart-icon {
+  font-size: 24px;
+  font-weight: bold;
+}
+/* Products */
