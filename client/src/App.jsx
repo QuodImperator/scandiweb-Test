@@ -7,19 +7,19 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeCategory: 'women'
+      categoryChangeHandler: null
     };
   }
 
-  handleCategoryChange = (category) => {
-    this.setState({ activeCategory: category });
+  setCategoryChangeHandler = (handler) => {
+    this.setState({ categoryChangeHandler: handler });
   }
 
   render() {
     return (
-      <div className="App">
-        <Header onCategoryChange={this.handleCategoryChange} />
-        <ProductGrid activeCategory={this.state.activeCategory} />
+      <div>
+        <Header onCategoryChange={this.state.categoryChangeHandler} />
+        <ProductGrid onCategoryChange={this.setCategoryChangeHandler} />
       </div>
     );
   }

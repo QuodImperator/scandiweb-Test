@@ -1,12 +1,12 @@
 import React from 'react';
-import logo from './assets/a-logo.png'
-import cart from './assets/EmptyCart.png'
+import logo from './assets/a-logo.png';
+import cart from './assets/EmptyCart.png';
 
 class Header extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab: 'women',
+      activeTab: 'all',
     };
   }
 
@@ -26,41 +26,40 @@ class Header extends React.Component {
           <li>
             <a
               href="#"
-              className={activeTab === 'women' ? 'active' : ''}
-              onClick={() => this.handleClick('women')}
+              className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
+              onClick={() => this.handleClick('all')}
             >
-              WOMEN
+              ALL
             </a>
           </li>
           <li>
             <a
               href="#"
-              className={activeTab === 'men' ? 'active' : ''}
-              onClick={() => this.handleClick('men')}
+              className={`nav-link ${activeTab === 'clothes' ? 'active' : ''}`}
+              onClick={() => this.handleClick('clothes')}
             >
-              MEN
+              CLOTHES
             </a>
           </li>
           <li>
-            <a 
+            <a
               href="#"
-              className={activeTab === 'kids' ? 'active' : ''}
-              onClick={() => this.handleClick('kids')}
+              className={`nav-link ${activeTab === 'tech' ? 'active' : ''}`}
+              onClick={() => this.handleClick('tech')}
             >
-              KIDS
+              TECH
             </a>
           </li>
           <li>
             <img src={logo} alt="Logo" className="logo" />
           </li>
           <li>
-            <a href="#">
+            <a href="#" className="cart-link">
               <img src={cart} alt="Cart" className="cart" />
             </a>
           </li>
         </ul>
 
-        {/* Display the name of the selected category below the navigation */}
         <div className="category-display">
           <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
         </div>

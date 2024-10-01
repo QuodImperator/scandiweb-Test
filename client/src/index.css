@@ -10,7 +10,7 @@ li {
   float: left;
 }
 
-li a {
+li a.nav-link {
   display: block;
   color: rgb(0, 0, 0);
   text-align: center;
@@ -25,10 +25,9 @@ li a {
   display: inline-block;
 }
 
-li a:hover {
+li a.nav-link:hover {
   border-bottom: 2px solid rgb(0, 255, 0);
   padding-bottom: 5px;
-  display: inline-block;
   color: rgb(0, 255, 0);
 }
 
@@ -38,16 +37,27 @@ li a:hover {
   left: 900px;
 }
 
+li a.cart-link {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+li a.cart-link:hover {
+  border-bottom: none;
+  color: inherit;
+}
+
 .cart {
   position: absolute;
   top: 30px;
   left: 90%;
 }
 
-ul li a.active {
+ul li a.nav-link.active {
   color: rgb(0, 255, 0);
   border-bottom: 2px solid rgb(0, 255, 0);
 }
+
 /* Header */
 
 .category-display {
