@@ -22,7 +22,7 @@ class Resolvers
     public function getProducts($root, $args)
     {
         if (isset($args['categoryId'])) {
-            return Product::where('category_id', $args['categoryId'])->get();
+            return Product::where('category_id', $args['categoryId']);
         }
         return Product::all();
     }
@@ -34,58 +34,37 @@ class Resolvers
 
     public function addToCart($root, $args)
     {
-        $product = Product::find($args['productId']);
-        $cartItem = new CartItem([
-            'product_id' => $product->id,
+        $cartItem = new CartItem();
+        $id = $cartItem->save([
+            'product_id' => $args['productId'],
             'quantity' => 1,
-            'attribute_values' => json_encode($args['attributeValues'])
+            'attribute_values' => $args['attributeValues']
         ]);
-        $cartItem->save();
-        return $cartItem;
+        return CartItem::find($id);
     }
 
     public function removeFromCart($root, $args)
     {
-        $cartItem = CartItem::find($args['cartItemId']);
-        if ($cartItem) {
-            $cartItem->delete();
-            return true;
-        }
-        return false;
+        $cartItem = new CartItem();
+        return $cartItem->delete($args['cartItemId']);
     }
 
     public function updateCartItemQuantity($root, $args)
     {
-        $cartItem = CartItem::find($args['cartItemId']);
-        if ($cartItem) {
-            $cartItem->quantity = $args['quantity'];
-            $cartItem->save();
-            return $cartItem;
-        }
-        return null;
+        $cartItem = new CartItem();
+        $success = $cartItem->update($args['cartItemId'], ['quantity' => $args['quantity']]);
+        return $success ? CartItem::find($args['cartItemId']) : null;
     }
 
     public function placeOrder($root, $args)
     {
         $order = new Order();
-        $order->status = 'PENDING';
-        $order->save();
-
-        $total = 0;
-        foreach ($args['cartItems'] as $item) {
-            $product = Product::find($item['productId']);
-            $orderItem = $order->items()->create([
-                'product_id' => $product->id,
-                'quantity' => $item['quantity'],
-                'attribute_values' => json_encode($item['attributeValues']),
-                'price' => $product->prices->first()->amount
-            ]);
-            $total += $orderItem->price * $orderItem->quantity;
-        }
-
-        $order->total = $total;
-        $order->save();
-
-        return $order;
+        $orderId = $order->save([
+            'total_amount' => 0, // Calculate this based on cart items
+            'currency_code' => 'USD', // Get this from somewhere
+            'status' => 'PENDING',
+            'items' => $args['cartItems']
+        ]);
+        return Order::find($orderId);
     }
 }
