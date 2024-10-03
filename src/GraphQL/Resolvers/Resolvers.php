@@ -2,10 +2,10 @@
 
 namespace App\GraphQL\Resolvers;
 
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\CartItem;
-use App\Models\Order;
+use App\Model\Category;
+use App\Model\Product;
+use App\Model\CartItem;
+use App\Model\Order;
 
 class Resolvers
 {
