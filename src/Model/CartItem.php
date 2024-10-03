@@ -2,56 +2,98 @@
 
 namespace App\Model;
 
-use App\Database\Connection;
 use PDO;
+use InvalidArgumentException;
 
-class CartItem
+/**
+ * CartItem Model
+ * 
+ * This class represents the CartItem entity and provides methods to interact with the cart_items table.
+ */
+class CartItem extends Model
 {
-    private $db;
-
-    public function __construct()
+    /**
+     * Find a cart item by its ID
+     *
+     * @param int $id
+     * @return array|null
+     * @throws InvalidArgumentException
+     */
+    public static function find(int $id): ?array
     {
-        $this->db = Connection::getInstance()->getConnection();
-    }
+        if ($id <= 0) {
+            throw new InvalidArgumentException("Cart item ID must be a positive integer");
+        }
 
-    public static function find($id)
-    {
         $instance = new self();
-        $stmt = $instance->db->prepare("SELECT * FROM cart_items WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $instance->fetch("SELECT * FROM cart_items WHERE id = :id", ['id' => $id]);
     }
 
-    public function save($data)
+    /**
+     * Save a new cart item
+     *
+     * @param array $data
+     * @return int The ID of the newly created cart item
+     * @throws InvalidArgumentException
+     */
+    public function save(array $data): int
     {
-        $stmt = $this->db->prepare("
+        if (empty($data['product_id']) || empty($data['quantity']) || empty($data['attribute_values'])) {
+            throw new InvalidArgumentException("Invalid cart item data");
+        }
+
+        $stmt = $this->query("
             INSERT INTO cart_items (product_id, quantity, attribute_values)
             VALUES (:product_id, :quantity, :attribute_values)
-        ");
-        $stmt->execute([
+        ", [
             'product_id' => $data['product_id'],
             'quantity' => $data['quantity'],
             'attribute_values' => json_encode($data['attribute_values'])
         ]);
-        return $this->db->lastInsertId();
+
+        return (int) $this->db->lastInsertId();
     }
 
-    public function update($id, $data)
+    /**
+     * Update an existing cart item
+     *
+     * @param int $id
+     * @param array $data
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function update(int $id, array $data): bool
     {
-        $stmt = $this->db->prepare("
+        if ($id <= 0 || empty($data['quantity'])) {
+            throw new InvalidArgumentException("Invalid update data");
+        }
+
+        $stmt = $this->query("
             UPDATE cart_items
             SET quantity = :quantity
             WHERE id = :id
-        ");
-        return $stmt->execute([
+        ", [
             'id' => $id,
             'quantity' => $data['quantity']
         ]);
+
+        return $stmt->rowCount() > 0;
     }
 
-    public function delete($id)
+    /**
+     * Delete a cart item
+     *
+     * @param int $id
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function delete(int $id): bool
     {
-        $stmt = $this->db->prepare("DELETE FROM cart_items WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        if ($id <= 0) {
+            throw new InvalidArgumentException("Cart item ID must be a positive integer");
+        }
+
+        $stmt = $this->query("DELETE FROM cart_items WHERE id = :id", ['id' => $id]);
+        return $stmt->rowCount() > 0;
     }
 }

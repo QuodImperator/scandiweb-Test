@@ -2,62 +2,91 @@
 
 namespace App\Model;
 
-use App\Database\Connection;
 use PDO;
+use InvalidArgumentException;
 
-class Product
+/**
+ * Product Model
+ * 
+ * This class represents the Product entity and provides methods to interact with the products table.
+ */
+class Product extends Model
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Connection::getInstance()->getConnection();
-    }
-
-    public static function all()
+    /**
+     * Retrieve all products
+     *
+     * @return array
+     */
+    public static function all(): array
     {
         $instance = new self();
-        $stmt = $instance->db->query("SELECT * FROM products");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $instance->fetchAll("SELECT * FROM products");
     }
 
-    public static function find($id)
+    /**
+     * Find a product by its ID
+     *
+     * @param string $id
+     * @return array|null
+     * @throws InvalidArgumentException
+     */
+    public static function find(string $id): ?array
     {
+        if (empty($id)) {
+            throw new InvalidArgumentException("Product ID cannot be empty");
+        }
+
         $instance = new self();
-        $stmt = $instance->db->prepare("SELECT * FROM products WHERE product_id = :id");
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $instance->fetch("SELECT * FROM products WHERE product_id = :id", ['id' => $id]);
     }
 
-    public static function where($column, $value)
+    /**
+     * Find products by a specific column value
+     *
+     * @param string $column
+     * @param mixed $value
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    public static function where(string $column, $value): array
     {
+        if (empty($column)) {
+            throw new InvalidArgumentException("Column name cannot be empty");
+        }
+
         $instance = new self();
-        $stmt = $instance->db->prepare("SELECT * FROM products WHERE $column = :value");
-        $stmt->execute(['value' => $value]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $instance->fetchAll("SELECT * FROM products WHERE $column = :value", ['value' => $value]);
     }
 
-    public function attributes()
+    /**
+     * Get attributes for a product
+     *
+     * @param string $productId
+     * @return array
+     */
+    public function attributes(string $productId): array
     {
-        $stmt = $this->db->prepare("
+        return $this->fetchAll("
             SELECT a.*, pa.display_value, pa.value
             FROM attributes a
             JOIN product_attributes pa ON a.attribute_id = pa.attribute_id
             WHERE pa.product_id = :product_id
-        ");
-        $stmt->execute(['product_id' => $this->id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ", ['product_id' => $productId]);
     }
 
-    public function prices()
+    /**
+     * Get prices for a product
+     *
+     * @param string $productId
+     * @return array
+     */
+    public function prices(string $productId): array
     {
-        $stmt = $this->db->prepare("
+        return $this->fetchAll("
             SELECT p.*, c.label, c.symbol
             FROM prices p
             JOIN currencies c ON p.currency_code = c.currency_code
             WHERE p.product_id = :product_id
-        ");
-        $stmt->execute(['product_id' => $this->id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ", ['product_id' => $productId]);
     }
 }

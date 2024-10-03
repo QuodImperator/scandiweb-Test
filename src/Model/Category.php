@@ -2,37 +2,52 @@
 
 namespace App\Model;
 
-use App\Database\Connection;
 use PDO;
+use InvalidArgumentException;
 
-class Category
+/**
+ * Category Model
+ * 
+ * This class represents the Category entity and provides methods to interact with the categories table.
+ */
+class Category extends Model
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Connection::getInstance()->getConnection();
-    }
-
-    public static function all()
+    /**
+     * Retrieve all categories
+     *
+     * @return array
+     */
+    public static function all(): array
     {
         $instance = new self();
-        $stmt = $instance->db->query("SELECT * FROM categories");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $instance->fetchAll("SELECT * FROM categories");
     }
 
-    public static function find($id)
+    /**
+     * Find a category by its ID
+     *
+     * @param int $id
+     * @return array|null
+     * @throws InvalidArgumentException
+     */
+    public static function find(int $id): ?array
     {
+        if ($id <= 0) {
+            throw new InvalidArgumentException("Category ID must be a positive integer");
+        }
+
         $instance = new self();
-        $stmt = $instance->db->prepare("SELECT * FROM categories WHERE category_id = :id");
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $instance->fetch("SELECT * FROM categories WHERE category_id = :id", ['id' => $id]);
     }
 
-    public function products()
+    /**
+     * Get products for a category
+     *
+     * @param int $categoryId
+     * @return array
+     */
+    public function products(int $categoryId): array
     {
-        $stmt = $this->db->prepare("SELECT * FROM products WHERE category_id = :category_id");
-        $stmt->execute(['category_id' => $this->id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->fetchAll("SELECT * FROM products WHERE category_id = :category_id", ['category_id' => $categoryId]);
     }
 }
