@@ -40,7 +40,13 @@ class GraphQLController
 
         $rawInput = file_get_contents('php://input');
         $input = json_decode($rawInput, true);
-        $query = $input['query'];
+
+        if (isset($input['query'])) {
+            $query = $input['query'];
+        } else {
+            return json_encode(['error' => 'Query not provided']);
+        };
+        
         $variableValues = isset($input['variables']) ? $input['variables'] : null;
 
         try {
