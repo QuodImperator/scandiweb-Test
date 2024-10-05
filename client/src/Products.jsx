@@ -24,16 +24,18 @@ const GET_PRODUCTS = gql`
 class ProductCard extends React.Component {
     render() {
         const { product } = this.props;
+        const price = product.prices[0]; // Assuming the first price is the default
+
         return (
             <div className="product-card">
-                <img src={product.image} alt={product.name} className="product-image" />
+                <img src={product.gallery[0]} alt={product.name} className="product-image" />
                 {!product.inStock && (
                     <div className="out-of-stock-overlay">
                         <span className="out-of-stock">OUT OF STOCK</span>
                     </div>
                 )}
                 <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">${product.price.toFixed(2)}</p>
+                <p className="product-price">{price.currency.symbol}{price.amount.toFixed(2)}</p>
                 {product.inStock && (
                     <button className="add-to-cart">
                         <img src={buy_icon} alt="Add to cart" className="cart-icon" />
@@ -50,7 +52,7 @@ class ProductGrid extends React.Component {
             <Query query={GET_PRODUCTS}>
                 {({ loading, error, data }) => {
                     if (loading) return <p>Loading...</p>;
-                    if (error) return <p>Error :(</p>;
+                    if (error) return <p>Error: {error.message}</p>;
 
                     return (
                         <div className="product-container">

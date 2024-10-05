@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
 const httpLink = createHttpLink({
-    uri: 'http://localhost:8080/scandiweb%20test/public/',
+    uri: 'http://localhost:8080/graphql',
     credentials: 'same-origin'
   });
 
