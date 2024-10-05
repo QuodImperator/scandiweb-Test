@@ -1,18 +1,25 @@
 import React from 'react';
-import blouse1 from './assets/test_blouse1.jpg'
-import blouse2 from './assets/test_blouse2.jpg'
-import buy_icon from './assets/circle_icon.png'
+import { Query } from '@apollo/client/react/components';
+import { gql } from '@apollo/client';
+import buy_icon from './assets/circle_icon.png';
 
-const products = [
-    { id: 1, name: 'Running Short', price: 50.00, image: blouse1, inStock: true, category: 'clothes' },
-    { id: 2, name: 'Running Short', price: 50.00, image: blouse1, inStock: true, category: 'clothes' },
-    { id: 3, name: 'Running Short', price: 50.00, image: blouse1, inStock: false, category: 'clothes' },
-    { id: 4, name: 'Running Short', price: 50.00, image: blouse1, inStock: true, category: 'clothes' },
-    { id: 5, name: 'Running Short', price: 50.00, image: blouse1, inStock: true, category: 'clothes' },
-    { id: 6, name: 'Running Short', price: 50.00, image: blouse1, inStock: true, category: 'clothes' },
-    { id: 7, name: 'Smart Watch', price: 50.00, image: blouse2, inStock: true, category: 'tech' },
-    { id: 8, name: 'Wireless Earbuds', price: 50.00, image: blouse2, inStock: true, category: 'tech' },
-];
+const GET_PRODUCTS = gql`
+  query GetProducts {
+    products {
+      id
+      name
+      inStock
+      gallery
+      prices {
+        amount
+        currency {
+          symbol
+        }
+      }
+      brand
+    }
+  }
+`;
 
 class ProductCard extends React.Component {
     render() {
@@ -38,37 +45,24 @@ class ProductCard extends React.Component {
 }
 
 class ProductGrid extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            selectedCategory: 'all'
-        };
-    }
-
-    componentDidMount() {
-        if (this.props.onCategoryChange) {
-            this.props.onCategoryChange(this.handleCategoryChange);
-        }
-    }
-
-    handleCategoryChange = (category) => {
-        this.setState({ selectedCategory: category });
-    }
-
     render() {
-        const { selectedCategory } = this.state;
-        const filteredProducts = selectedCategory === 'all' 
-            ? products 
-            : products.filter(product => product.category === selectedCategory);
-
         return (
-            <div className="product-container">
-                <div className="product-grid">
-                    {filteredProducts.map(product => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-            </div>
+            <Query query={GET_PRODUCTS}>
+                {({ loading, error, data }) => {
+                    if (loading) return <p>Loading...</p>;
+                    if (error) return <p>Error :(</p>;
+
+                    return (
+                        <div className="product-container">
+                            <div className="product-grid">
+                                {data.products.map(product => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }}
+            </Query>
         );
     }
 }
