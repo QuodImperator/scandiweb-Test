@@ -12,6 +12,8 @@ class GraphQLController
 {
     public function handle()
     {
+        ob_start();
+        
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
         header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -19,27 +21,27 @@ class GraphQLController
         if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
             exit(0);
         }
-
+    
         // Create an instance of your Resolvers class
         $resolvers = new Resolvers();
-
+    
         // Create the schema using your new QueryType and MutationType
         $schema = new Schema([
             'query' => new QueryType($resolvers),
             'mutation' => new MutationType($resolvers),
         ]);
-
+    
         $rawInput = file_get_contents('php://input');
         $input = json_decode($rawInput, true);
-
+    
         if (!isset($input['query'])) {
             $this->respondWithError('Query not provided');
             return;
         }
-
+    
         $query = $input['query'];
         $variableValues = isset($input['variables']) ? $input['variables'] : null;
-
+    
         try {
             $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
             $output = $result->toArray();
@@ -47,7 +49,12 @@ class GraphQLController
             $this->respondWithError('GraphQL execution error: ' . $e->getMessage());
             return;
         }
-
+    
+        $buffer = ob_get_clean();
+        if (!empty($buffer)) {
+            error_log("Unexpected output before JSON: " . $buffer);
+        }
+    
         $this->respondWithJson($output);
     }
 

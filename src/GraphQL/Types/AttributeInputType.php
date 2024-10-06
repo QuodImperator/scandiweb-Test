@@ -2,9 +2,9 @@
 
 namespace App\GraphQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\InputObjectType;
 
-class AttributeInputType extends ObjectType
+class AttributeInputType extends InputObjectType
 {
     public function __construct()
     {
