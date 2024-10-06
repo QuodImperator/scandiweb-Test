@@ -4,7 +4,8 @@ namespace App\Controller;
 
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
-use GraphQL\Utils\BuildSchema;
+use App\GraphQL\Types\QueryType;
+use App\GraphQL\Types\MutationType;
 use App\GraphQL\Resolvers\Resolvers;
 
 class GraphQLController
@@ -19,50 +20,46 @@ class GraphQLController
             exit(0);
         }
 
-        // Read the schema file
-        $schemaFile = __DIR__ . '/../GraphQL/Schema/schema.graphql';
-        $schemaContents = file_get_contents($schemaFile);
+        // Create an instance of your Resolvers class
+        $resolvers = new Resolvers();
 
-        // Build the schema
-        $schema = BuildSchema::build($schemaContents);
-
-        // Set up resolvers
-        $rootValue = [
-            'categories' => [new Resolvers(), 'getCategories'],
-            'category' => [new Resolvers(), 'getCategory'],
-            'products' => [new Resolvers(), 'getProducts'],
-            'product' => [new Resolvers(), 'getProduct'],
-            'addToCart' => [new Resolvers(), 'addToCart'],
-            'removeFromCart' => [new Resolvers(), 'removeFromCart'],
-            'updateCartItemQuantity' => [new Resolvers(), 'updateCartItemQuantity'],
-            'placeOrder' => [new Resolvers(), 'placeOrder'],
-        ];
+        // Create the schema using your new QueryType and MutationType
+        $schema = new Schema([
+            'query' => new QueryType($resolvers),
+            'mutation' => new MutationType($resolvers),
+        ]);
 
         $rawInput = file_get_contents('php://input');
         $input = json_decode($rawInput, true);
 
-        if (isset($input['query'])) {
-            $query = $input['query'];
-        } else {
-            return json_encode(['error' => 'Query not provided']);
-        };
-        
+        if (!isset($input['query'])) {
+            $this->respondWithError('Query not provided');
+            return;
+        }
+
+        $query = $input['query'];
         $variableValues = isset($input['variables']) ? $input['variables'] : null;
 
         try {
-            $result = GraphQL::executeQuery($schema, $query, $rootValue, null, $variableValues);
+            $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
             $output = $result->toArray();
         } catch (\Exception $e) {
-            $output = [
-                'errors' => [
-                    [
-                        'message' => $e->getMessage()
-                    ]
-                ]
-            ];
+            $this->respondWithError('GraphQL execution error: ' . $e->getMessage());
+            return;
         }
 
+        $this->respondWithJson($output);
+    }
+
+    private function respondWithError($message)
+    {
+        $this->respondWithJson(['errors' => [['message' => $message]]], 400);
+    }
+
+    private function respondWithJson($data, $statusCode = 200)
+    {
         header('Content-Type: application/json');
-        echo json_encode($output);
+        http_response_code($statusCode);
+        echo json_encode($data);
     }
 }
