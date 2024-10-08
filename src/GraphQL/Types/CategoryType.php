@@ -3,6 +3,8 @@
 namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
+use App\GraphQL\Types\TypeRegistry;
+use App\Model\Product;
 
 class CategoryType extends ObjectType
 {
@@ -10,11 +12,18 @@ class CategoryType extends ObjectType
     {
         parent::__construct([
             'name' => 'Category',
-            'fields' => [
-                'id' => TypeRegistry::nonNull(TypeRegistry::id()),
-                'name' => TypeRegistry::nonNull(TypeRegistry::string()),
-                'products' => TypeRegistry::listOf(TypeRegistry::product()),
-            ],
+            'fields' => function() {
+                return [
+                    'id' => TypeRegistry::nonNull(TypeRegistry::id()),
+                    'name' => TypeRegistry::nonNull(TypeRegistry::string()),
+                    'products' => [
+                        'type' => TypeRegistry::listOf(TypeRegistry::product()),
+                        'resolve' => function($category) {
+                            return Product::where('category_id', $category['id']);
+                        }
+                    ],
+                ];
+            }
         ]);
     }
 }
