@@ -46,8 +46,18 @@ class GraphQLController
             $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
             $output = $result->toArray();
         } catch (\Exception $e) {
-            $this->respondWithError('GraphQL execution error: ' . $e->getMessage());
-            return;
+            error_log($e->getMessage() . "\n" . $e->getTraceAsString());
+            
+            $output = [
+                'errors' => [
+                    [
+                        'message' => 'GraphQL execution error: ' . $e->getMessage(),
+                        'locations' => [['line' => $e->getLine(), 'column' => 0]],
+                        'path' => null,
+                        'trace' => $e->getTraceAsString()
+                    ]
+                ]
+            ];
         }
     
         $buffer = ob_get_clean();
