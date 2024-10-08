@@ -33,15 +33,6 @@ class GraphQLController
             $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
             $output = $result->toArray();
     
-            if (isset($output['errors'])) {
-                foreach ($output['errors'] as $error) {
-                    error_log('GraphQL error: ' . $error['message']);
-                    if (isset($error['trace'])) {
-                        error_log('Trace: ' . json_encode($error['trace']));
-                    }
-                }
-            }
-    
             error_log('GraphQL result: ' . json_encode($output));
         } catch (\Exception $e) {
             error_log('GraphQL execution error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());

@@ -11,11 +11,14 @@ class Resolvers
 {
     public function getCategories()
     {
+        error_log('Entering Resolvers::getCategories()');
         try {
-            return Category::all();
+            $categories = Category::all();
+            error_log('Categories from Category::all(): ' . json_encode($categories));
+            return $categories;
         } catch (\Exception $e) {
-            error_log('Error in getCategories: ' . $e->getMessage());
-            throw new \Exception('Failed to fetch categories: ' . $e->getMessage());
+            error_log('Exception in Resolvers::getCategories(): ' . $e->getMessage());
+            throw $e;
         }
     }
 

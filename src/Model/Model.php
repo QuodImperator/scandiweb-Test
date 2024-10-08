@@ -29,6 +29,16 @@ abstract class Model
 
     protected function fetchAll($sql, $params = [])
     {
-        return $this->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
+        error_log('Entering fetchAll method. SQL: ' . $sql);
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log('fetchAll result: ' . json_encode($result));
+            return $result;
+        } catch (\PDOException $e) {
+            error_log('PDOException in fetchAll: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }
