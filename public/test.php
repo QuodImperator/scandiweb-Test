@@ -6,12 +6,11 @@ error_reporting(E_ALL);
 // Set the GraphQL endpoint (make sure this matches your route)
 $url = 'http://localhost:8080/graphql';  // Adjust this to your actual GraphQL endpoint
 
-// Define the GraphQL query you want to test
+// Define a simple GraphQL query to fetch categories
 $query = '{
-  __schema {
-    types {
-      name
-    }
+  categories {
+    id
+    name
   }
 }';
 
@@ -40,7 +39,7 @@ if ($response === false) {
 } else {
   // Output the raw response
   echo '<pre>';
-  var_dump($response);  // Use var_dump to see the raw response.
+  var_dump(json_decode($response, true));  // Decode the response to see it as an array.
   echo '</pre>';
 }
 

@@ -20,7 +20,14 @@ class Category extends Model
     public static function all(): array
     {
         $instance = new self();
-        return $instance->fetchAll("SELECT * FROM categories");
+        try {
+            $categories = $instance->fetchAll("SELECT category_id, name FROM categories");
+            error_log('Categories fetched from database: ' . json_encode($categories));
+            return $categories;
+        } catch (\PDOException $e) {
+            error_log('Error fetching categories: ' . $e->getMessage());
+            throw new \Exception('Failed to fetch categories: ' . $e->getMessage());
+        }
     }
 
     /**

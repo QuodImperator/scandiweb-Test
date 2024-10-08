@@ -4,7 +4,6 @@ namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use App\GraphQL\Types\TypeRegistry;
-use App\Model\Product;
 
 class CategoryType extends ObjectType
 {
@@ -14,12 +13,16 @@ class CategoryType extends ObjectType
             'name' => 'Category',
             'fields' => function() {
                 return [
-                    'id' => TypeRegistry::nonNull(TypeRegistry::id()),
-                    'name' => TypeRegistry::nonNull(TypeRegistry::string()),
-                    'products' => [
-                        'type' => TypeRegistry::listOf(TypeRegistry::product()),
-                        'resolve' => function($category) {
-                            return Product::where('category_id', $category['id']);
+                    'id' => [
+                        'type' => TypeRegistry::nonNull(TypeRegistry::id()),
+                        'resolve' => function ($category) {
+                            return (string)$category['category_id'];
+                        }
+                    ],
+                    'name' => [
+                        'type' => TypeRegistry::nonNull(TypeRegistry::string()),
+                        'resolve' => function ($category) {
+                            return $category['name'];
                         }
                     ],
                 ];

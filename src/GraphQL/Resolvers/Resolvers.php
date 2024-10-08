@@ -11,7 +11,12 @@ class Resolvers
 {
     public function getCategories()
     {
-        return Category::all();
+        try {
+            return Category::all();
+        } catch (\Exception $e) {
+            error_log('Error in getCategories: ' . $e->getMessage());
+            throw new \Exception('Failed to fetch categories: ' . $e->getMessage());
+        }
     }
 
     public function getCategory($root, $args)
