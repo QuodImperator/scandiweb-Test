@@ -16,13 +16,13 @@ class QueryType extends ObjectType
                 'categories' => [
                     'type' => TypeRegistry::listOf(TypeRegistry::category()),
                     'resolve' => function () use ($resolvers) {
-                        error_log('Entering categories resolver');
+                        error_log('Entering categories resolver in QueryType');
                         try {
                             $result = $resolvers->getCategories();
-                            error_log('Categories resolver result: ' . json_encode($result));
+                            error_log('Categories resolver result in QueryType: ' . json_encode($result));
                             return $result;
                         } catch (\Exception $e) {
-                            error_log('Exception in categories resolver: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+                            error_log('Exception in categories resolver in QueryType: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
                             throw $e;
                         }
                     },

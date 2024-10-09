@@ -11,18 +11,27 @@ class Resolvers
 {
     public function getCategories()
     {
-        $categories = Category::all();  // Returns an array
-        return array_map(function($category) {
-            return [
-                'id' => $category['category_id'],
-                'name' => $category['name'],
-            ];
-        }, $categories);
+        error_log('Entering Resolvers::getCategories()');
+        try {
+            $categories = Category::all();
+            error_log('Categories from Category::all(): ' . json_encode($categories));
+            $result = array_map(function($category) {
+                return [
+                    'id' => (int)$category['category_id'],
+                    'name' => $category['name']
+                ];
+            }, $categories);
+            error_log('Mapped categories: ' . json_encode($result));
+            return $result;
+        } catch (\Exception $e) {
+            error_log('Exception in Resolvers::getCategories(): ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw $e;
+        }
     }
 
     public function getCategory($args)
     {
-        return Category::find($args['id']);
+        return Category::find((int)$args['id']);
     }
 
     public function getProducts($args)

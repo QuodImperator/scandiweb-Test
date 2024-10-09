@@ -1,12 +1,12 @@
 # src/GraphQL/Schema/schema.graphql
 
 type Category {
-  id: ID!
+  id: Int!
   name: String!
 }
 
 type Product {
-  id: ID!
+  id: Int!
   name: String!
   inStock: Boolean!
   gallery: [String!]!
@@ -18,14 +18,14 @@ type Product {
 }
 
 type Attribute {
-  id: ID!
+  id: Int!
   name: String!
   type: String!
   items: [AttributeItem!]!
 }
 
 type AttributeItem {
-  id: ID!
+  id: Int!
   displayValue: String!
   value: String!
 }
@@ -42,38 +42,38 @@ type Currency {
 
 type Query {
   categories: [Category!]!
-  category(id: ID!): Category
+  category(id: Int!): Category
   products(categoryId: ID): [Product!]!
-  product(id: ID!): Product
+  product(id: Int!): Product
 }
 
 type Mutation {
-  addToCart(productId: ID!, attributeValues: [AttributeInput!]!): CartItem!
-  removeFromCart(cartItemId: ID!): Boolean!
-  updateCartItemQuantity(cartItemId: ID!, quantity: Int!): CartItem!
+  addToCart(productId: Int!, attributeValues: [AttributeInput!]!): CartItem!
+  removeFromCart(cartItemId: Int!): Boolean!
+  updateCartItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
   placeOrder(cartItems: [CartItemInput!]!): Order!
 }
 
 input AttributeInput {
-  id: ID!
+  id: Int!
   value: String!
 }
 
 input CartItemInput {
-  productId: ID!
+  productId: Int!
   quantity: Int!
   attributeValues: [AttributeInput!]!
 }
 
 type CartItem {
-  id: ID!
+  id: Int!
   product: Product!
   quantity: Int!
   attributeValues: [AttributeItem!]!
 }
 
 type Order {
-  id: ID!
+  id: Int!
   items: [OrderItem!]!
   total: Price!
   status: OrderStatus!
