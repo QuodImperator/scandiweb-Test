@@ -11,23 +11,21 @@ class Resolvers
 {
     public function getCategories()
     {
-        error_log('Entering Resolvers::getCategories()');
-        try {
-            $categories = Category::all();
-            error_log('Categories from Category::all(): ' . json_encode($categories));
-            return $categories;
-        } catch (\Exception $e) {
-            error_log('Exception in Resolvers::getCategories(): ' . $e->getMessage());
-            throw $e;
-        }
+        $categories = Category::all();  // Returns an array
+        return array_map(function($category) {
+            return [
+                'id' => $category['category_id'],
+                'name' => $category['name'],
+            ];
+        }, $categories);
     }
 
-    public function getCategory($root, $args)
+    public function getCategory($args)
     {
         return Category::find($args['id']);
     }
 
-    public function getProducts($root, $args)
+    public function getProducts($args)
     {
         if (isset($args['categoryId'])) {
             return Product::where('category_id', $args['categoryId']);
@@ -35,12 +33,12 @@ class Resolvers
         return Product::all();
     }
 
-    public function getProduct($root, $args)
+    public function getProduct($args)
     {
         return Product::find($args['id']);
     }
 
-    public function addToCart($root, $args)
+    public function addToCart($args)
     {
         $cartItem = new CartItem();
         $id = $cartItem->save([
@@ -51,20 +49,20 @@ class Resolvers
         return CartItem::find($id);
     }
 
-    public function removeFromCart($root, $args)
+    public function removeFromCart($args)
     {
         $cartItem = new CartItem();
         return $cartItem->delete($args['cartItemId']);
     }
 
-    public function updateCartItemQuantity($root, $args)
+    public function updateCartItemQuantity($args)
     {
         $cartItem = new CartItem();
         $success = $cartItem->update($args['cartItemId'], ['quantity' => $args['quantity']]);
         return $success ? CartItem::find($args['cartItemId']) : null;
     }
 
-    public function placeOrder($root, $args)
+    public function placeOrder($args)
     {
         $order = new Order();
         $orderId = $order->save([

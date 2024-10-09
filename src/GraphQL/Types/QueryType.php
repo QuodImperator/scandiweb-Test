@@ -4,6 +4,7 @@ namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use App\GraphQL\Resolvers\Resolvers;
+use App\GraphQL\Types\TypeRegistry;
 
 class QueryType extends ObjectType
 {
@@ -14,14 +15,14 @@ class QueryType extends ObjectType
             'fields' => [
                 'categories' => [
                     'type' => TypeRegistry::listOf(TypeRegistry::category()),
-                    'resolve' => function ($root, $args) use ($resolvers) {
+                    'resolve' => function () use ($resolvers) {
                         error_log('Entering categories resolver');
                         try {
                             $result = $resolvers->getCategories();
                             error_log('Categories resolver result: ' . json_encode($result));
                             return $result;
                         } catch (\Exception $e) {
-                            error_log('Exception in categories resolver: ' . $e->getMessage());
+                            error_log('Exception in categories resolver: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
                             throw $e;
                         }
                     },
