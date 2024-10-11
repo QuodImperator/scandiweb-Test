@@ -24,7 +24,7 @@ const GET_PRODUCTS = gql`
 class ProductCard extends React.Component {
     render() {
         const { product } = this.props;
-        const price = product.prices[0]; // Assuming the first price is the default
+        const price = product.prices && product.prices.length > 0 ? product.prices[0] : null;
 
         return (
             <div className="product-card">
@@ -35,7 +35,11 @@ class ProductCard extends React.Component {
                     </div>
                 )}
                 <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">{price.currency.symbol}{price.amount.toFixed(2)}</p>
+                {price ? (
+                    <p className="product-price">{price.currency.symbol}{price.amount.toFixed(2)}</p>
+                ) : (
+                    <p className="product-price">Price not available</p>
+                )}
                 {product.inStock && (
                     <button className="add-to-cart">
                         <img src={buy_icon} alt="Add to cart" className="cart-icon" />

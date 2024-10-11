@@ -50,10 +50,6 @@ class Product extends Model
      */
     public static function where(string $column, $value): array
     {
-        if (empty($column)) {
-            throw new InvalidArgumentException("Column name cannot be empty");
-        }
-
         $instance = new self();
         return $instance->fetchAll("SELECT * FROM products WHERE $column = :value", ['value' => $value]);
     }
@@ -80,10 +76,11 @@ class Product extends Model
      * @param string $productId
      * @return array
      */
-    public function prices(string $productId): array
+    public static function prices($productId)
     {
-        return $this->fetchAll("
-            SELECT p.*, c.label, c.symbol
+        $instance = new self();
+        return $instance->fetchAll("
+            SELECT p.amount, c.symbol, c.label
             FROM prices p
             JOIN currencies c ON p.currency_code = c.currency_code
             WHERE p.product_id = :product_id

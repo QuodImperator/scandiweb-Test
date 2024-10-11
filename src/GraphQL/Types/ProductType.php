@@ -13,10 +13,25 @@ class ProductType extends ObjectType
             'name' => 'Product',
             'fields' => function() {
                 return [
-                    'id' => TypeRegistry::nonNull(TypeRegistry::id()),
+                    'id' => [
+                        'type' => TypeRegistry::nonNull(TypeRegistry::string()),
+                        'resolve' => function ($product) {
+                            return $product['product_id'];
+                        }
+                    ],
                     'name' => TypeRegistry::nonNull(TypeRegistry::string()),
-                    'inStock' => TypeRegistry::nonNull(TypeRegistry::boolean()),
-                    'gallery' => TypeRegistry::listOf(TypeRegistry::string()),
+                    'inStock' => [
+                        'type' => TypeRegistry::nonNull(TypeRegistry::boolean()),
+                        'resolve' => function ($product) {
+                            return (bool)$product['is_in_stock'];
+                        }
+                    ],
+                    'gallery' => [
+                        'type' => TypeRegistry::listOf(TypeRegistry::string()),
+                        'resolve' => function ($product) {
+                            return json_decode($product['gallery'], true);
+                        }
+                    ],
                     'description' => TypeRegistry::string(),
                     'category' => [
                         'type' => TypeRegistry::category(),
@@ -25,8 +40,14 @@ class ProductType extends ObjectType
                         }
                     ],
                     'brand' => TypeRegistry::string(),
-                    'attributes' => TypeRegistry::listOf(TypeRegistry::attribute()),
-                    'prices' => TypeRegistry::listOf(TypeRegistry::price()),
+                    'prices' => [
+                        'type' => TypeRegistry::listOf(TypeRegistry::price()),
+                        'resolve' => function($product) {
+                            // Fetch prices from the database
+                            $prices = \App\Model\Product::prices($product['product_id']);
+                            return $prices;
+                        }
+                    ],
                 ];
             }
         ]);
