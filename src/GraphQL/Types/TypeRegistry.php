@@ -4,6 +4,17 @@ namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
+use App\GraphQL\Types\AttributeItemType;
+use App\GraphQL\Types\AttributeInputType;
+use App\GraphQL\Types\CategoryType;
+use App\GraphQL\Types\ProductType;
+use App\GraphQL\Types\CartItemType;
+use App\GraphQL\Types\OrderType;
+use App\GraphQL\Types\AttributeType;
+use App\GraphQL\Types\PriceType;
+use App\GraphQL\Types\OrderItemType;
+use App\GraphQL\Types\CurrencyType;
+use App\GraphQL\Types\CartItemInputType;
 
 class TypeRegistry
 {

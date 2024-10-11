@@ -10,11 +10,13 @@ class AttributeItemType extends ObjectType
     {
         parent::__construct([
             'name' => 'AttributeItem',
-            'fields' => [
-                'id' => TypeRegistry::nonNull(TypeRegistry::id()),
-                'displayValue' => TypeRegistry::nonNull(TypeRegistry::string()),
-                'value' => TypeRegistry::nonNull(TypeRegistry::string()),
-            ],
+            'fields' => function() {
+                return [
+                    'id' => TypeRegistry::nonNull(TypeRegistry::int()),
+                    'displayValue' => TypeRegistry::nonNull(TypeRegistry::string()),
+                    'value' => TypeRegistry::nonNull(TypeRegistry::string()),
+                ];
+            }
         ]);
     }
 }

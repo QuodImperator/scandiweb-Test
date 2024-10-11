@@ -15,17 +15,10 @@ class Resolvers
         try {
             $categories = Category::all();
             error_log('Categories from Category::all(): ' . json_encode($categories));
-            $result = array_map(function($category) {
-                return [
-                    'id' => (int)$category['category_id'],
-                    'name' => $category['name']
-                ];
-            }, $categories);
-            error_log('Mapped categories: ' . json_encode($result));
-            return $result;
+            return $categories ?: []; // Return an empty array if $categories is null or false
         } catch (\Exception $e) {
             error_log('Exception in Resolvers::getCategories(): ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-            throw $e;
+            return []; // Return an empty array on error
         }
     }
 
@@ -53,7 +46,9 @@ class Resolvers
         $id = $cartItem->save([
             'product_id' => $args['productId'],
             'quantity' => 1,
-            'attribute_values' => $args['attributeValues']
+            'attribute_values' => array_map(function($attr) {
+                return ['id' => $attr['id'], 'value' => $attr['value']];
+            }, $args['attributeValues'])
         ]);
         return CartItem::find($id);
     }

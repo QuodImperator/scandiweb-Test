@@ -4,7 +4,6 @@ namespace App\Database;
 
 use PDO;
 use PDOException;
-use Exception;
 
 class Connection
 {
@@ -13,38 +12,26 @@ class Connection
 
     private function __construct()
     {
+        $dbConfig = $this->loadConfig();
+        $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']};charset={$dbConfig['charset']}";
+
         try {
-            $host = $_ENV['DB_HOST'];
-            $port = $_ENV['DB_PORT'] ?? '3306';
-            $db   = $_ENV['DB_NAME'];
-            $user = $_ENV['DB_USER'];
-            $pass = $_ENV['DB_PASS'];
-            $charset = 'utf8mb4';
-    
-            $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-            $options = [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            $this->conn = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-            ];
-    
-            $this->conn = new PDO($dsn, $user, $pass, $options);
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]);
             error_log('Database connection established successfully');
         } catch (PDOException $e) {
             error_log('Database connection failed: ' . $e->getMessage());
-            throw new PDOException($e->getMessage(), (int)$e->getCode());
+            throw new PDOException('Database connection failed: ' . $e->getMessage(), (int)$e->getCode());
         }
     }
 
     public static function getInstance()
     {
-        if (self::$instance == null) {
-            try {
-                self::$instance = new Connection();
-            } catch (PDOException $e) {
-                error_log('Database connection failed: ' . $e->getMessage());
-                throw $e;
-            }
+        if (self::$instance === null) {
+            self::$instance = new self();
         }
         return self::$instance;
     }
@@ -54,12 +41,33 @@ class Connection
         return $this->conn;
     }
 
+    private function loadConfig()
+    {
+        // You can adjust this path as needed
+        $configPath = __DIR__ . '/../config/database.php';
+        
+        if (!file_exists($configPath)) {
+            throw new \RuntimeException('Database configuration file not found');
+        }
+
+        $config = require $configPath;
+
+        $requiredKeys = ['host', 'dbname', 'user', 'password', 'charset'];
+        foreach ($requiredKeys as $key) {
+            if (!isset($config[$key])) {
+                throw new \RuntimeException("Missing required configuration key: $key");
+            }
+        }
+
+        return $config;
+    }
+
     // Prevent cloning of the instance
     private function __clone() {}
 
     // Prevent unserializing of the instance
     public function __wakeup()
     {
-        throw new Exception("Cannot unserialize singleton");
+        throw new \Exception("Cannot unserialize singleton");
     }
 }

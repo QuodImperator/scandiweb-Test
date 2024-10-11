@@ -4,7 +4,6 @@ namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use App\GraphQL\Resolvers\Resolvers;
-use App\GraphQL\Types\TypeRegistry;
 
 class QueryType extends ObjectType
 {

@@ -3,7 +3,6 @@
 namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
-use App\GraphQL\Types\TypeRegistry;
 use App\Model\Category;
 
 class ProductType extends ObjectType

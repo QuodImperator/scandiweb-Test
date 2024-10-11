@@ -3,7 +3,6 @@
 namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
-use App\GraphQL\Types\TypeRegistry;
 
 class CategoryType extends ObjectType
 {
@@ -12,18 +11,16 @@ class CategoryType extends ObjectType
         parent::__construct([
             'name' => 'Category',
             'fields' => [
-                'id' => [
-                    'type' => TypeRegistry::nonNull(TypeRegistry::int()),
+                'category_id' => [
+                    'type' => TypeRegistry::int(),
                     'resolve' => function ($category) {
-                        error_log('Resolving id for category: ' . json_encode($category));
-                        return isset($category['id']) ? (int)$category['id'] : null;
+                        return (int)$category['category_id'];
                     }
                 ],
                 'name' => [
-                    'type' => TypeRegistry::nonNull(TypeRegistry::string()),
+                    'type' => TypeRegistry::string(),
                     'resolve' => function ($category) {
-                        error_log('Resolving name for category: ' . json_encode($category));
-                        return $category['name'] ?? '';
+                        return $category['name'];
                     }
                 ]
             ]

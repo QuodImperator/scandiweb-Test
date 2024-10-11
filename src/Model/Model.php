@@ -14,7 +14,6 @@ abstract class Model
         $this->db = Connection::getInstance()->getConnection();
     }
 
-    // Common methods that all models might use can go here
     protected function query($sql, $params = [])
     {
         $stmt = $this->db->prepare($sql);

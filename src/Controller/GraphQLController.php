@@ -7,6 +7,8 @@ use GraphQL\Type\Schema;
 use App\GraphQL\Types\QueryType;
 use App\GraphQL\Types\MutationType;
 use App\GraphQL\Resolvers\Resolvers;
+use GraphQL\Error\DebugFlag;
+use App\GraphQL\Types\TypeRegistry;
 
 class GraphQLController
 {
@@ -24,6 +26,21 @@ class GraphQLController
             $schema = new Schema([
                 'query' => new QueryType($this->resolvers),
                 'mutation' => new MutationType($this->resolvers),
+                'types' => function() {
+                    return [
+                        TypeRegistry::category(),
+                        TypeRegistry::product(),
+                        TypeRegistry::attribute(),
+                        TypeRegistry::attributeItem(),
+                        TypeRegistry::attributeInput(),
+                        TypeRegistry::price(),
+                        TypeRegistry::currency(),
+                        TypeRegistry::cartItem(),
+                        TypeRegistry::order(),
+                        TypeRegistry::orderItem(),
+                        TypeRegistry::orderStatus(),
+                    ];
+                },
             ]);
     
             $input = json_decode(file_get_contents('php://input'), true);
@@ -31,14 +48,11 @@ class GraphQLController
             $variableValues = isset($input['variables']) ? $input['variables'] : null;
     
             $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
-            $output = $result->toArray();
+            $output = $result->toArray(DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE);
     
             if (isset($output['errors'])) {
                 foreach ($output['errors'] as $error) {
-                    error_log('GraphQL error: ' . $error['message']);
-                    if (isset($error['trace'])) {
-                        error_log('Trace: ' . json_encode($error['trace']));
-                    }
+                    error_log('GraphQL error: ' . json_encode($error));
                 }
             }
     
