@@ -11,7 +11,7 @@ class ProductType extends ObjectType
     {
         parent::__construct([
             'name' => 'Product',
-            'fields' => function() {
+            'fields' => function () {
                 return [
                     'id' => [
                         'type' => TypeRegistry::nonNull(TypeRegistry::string()),
@@ -35,17 +35,15 @@ class ProductType extends ObjectType
                     'description' => TypeRegistry::string(),
                     'category' => [
                         'type' => TypeRegistry::category(),
-                        'resolve' => function($product) {
+                        'resolve' => function ($product) {
                             return Category::find($product['category_id']);
                         }
                     ],
                     'brand' => TypeRegistry::string(),
                     'prices' => [
                         'type' => TypeRegistry::listOf(TypeRegistry::price()),
-                        'resolve' => function($product) {
-                            // Fetch prices from the database
-                            $prices = \App\Model\Product::prices($product['product_id']);
-                            return $prices;
+                        'resolve' => function ($product) {
+                            return $product['prices'];
                         }
                     ],
                 ];

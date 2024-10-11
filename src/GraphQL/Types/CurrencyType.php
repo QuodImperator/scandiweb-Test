@@ -11,7 +11,6 @@ class CurrencyType extends ObjectType
         parent::__construct([
             'name' => 'Currency',
             'fields' => [
-                'label' => TypeRegistry::nonNull(TypeRegistry::string()),
                 'symbol' => TypeRegistry::nonNull(TypeRegistry::string()),
             ],
         ]);

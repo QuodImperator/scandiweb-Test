@@ -86,4 +86,50 @@ class Product extends Model
             WHERE p.product_id = :product_id
         ", ['product_id' => $productId]);
     }
+
+    /**
+     * Get products with prices
+     *
+     * @param string|null $categoryId
+     * @return array
+     */
+    public static function getProductsWithPrices($categoryId = null)
+    {
+        $instance = new self();
+        $query = "
+            SELECT p.*, 
+                   GROUP_CONCAT(CONCAT(pr.amount, ':', c.symbol) SEPARATOR '|') as prices
+            FROM products p
+            LEFT JOIN prices pr ON p.product_id = pr.product_id
+            LEFT JOIN currencies c ON pr.currency_code = c.currency_code
+        ";
+        
+        $params = [];
+        if ($categoryId !== null) {
+            $query .= " WHERE p.category_id = :category_id";
+            $params['category_id'] = $categoryId;
+        }
+        
+        $query .= " GROUP BY p.product_id";
+        
+        $products = $instance->fetchAll($query, $params);
+        
+        // Process the prices
+        foreach ($products as &$product) {
+            $pricesArray = [];
+            if ($product['prices']) {
+                $pricesStrings = explode('|', $product['prices']);
+                foreach ($pricesStrings as $priceString) {
+                    list($amount, $symbol) = explode(':', $priceString);
+                    $pricesArray[] = [
+                        'amount' => (float)$amount,
+                        'currency' => ['symbol' => $symbol]
+                    ];
+                }
+            }
+            $product['prices'] = $pricesArray;
+        }
+        
+        return $products;
+    }
 }

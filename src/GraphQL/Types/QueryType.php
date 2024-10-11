@@ -14,32 +14,14 @@ class QueryType extends ObjectType
             'fields' => [
                 'categories' => [
                     'type' => TypeRegistry::listOf(TypeRegistry::category()),
-                    'resolve' => function () use ($resolvers) {
-                        error_log('Entering categories resolver in QueryType');
-                        try {
-                            $result = $resolvers->getCategories();
-                            error_log('Categories resolver result in QueryType: ' . json_encode($result));
-                            return $result;
-                        } catch (\Exception $e) {
-                            error_log('Exception in categories resolver in QueryType: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-                            throw $e;
-                        }
-                    },
-                ],
-                'category' => [
-                    'type' => TypeRegistry::category(),
-                    'args' => ['id' => TypeRegistry::nonNull(TypeRegistry::id())],
-                    'resolve' => [$resolvers, 'getCategory'],
+                    'resolve' => [$resolvers, 'getCategories'],
                 ],
                 'products' => [
                     'type' => TypeRegistry::listOf(TypeRegistry::product()),
-                    'args' => ['categoryId' => TypeRegistry::id()],
+                    'args' => [
+                        'categoryId' => TypeRegistry::string(),
+                    ],
                     'resolve' => [$resolvers, 'getProducts'],
-                ],
-                'product' => [
-                    'type' => TypeRegistry::product(),
-                    'args' => ['id' => TypeRegistry::nonNull(TypeRegistry::id())],
-                    'resolve' => [$resolvers, 'getProduct'],
                 ],
             ],
         ]);

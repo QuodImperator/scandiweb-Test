@@ -27,14 +27,16 @@ class Resolvers
         return Category::find((int)$args['id']);
     }
 
-    public function getProducts($args)
+    public function getProducts($rootValue, $args)
     {
-        if (isset($args['categoryId'])) {
-            return Product::where('category_id', $args['categoryId']);
+        $categoryId = $args['categoryId'] ?? null;
+        if ($categoryId === 'all') {
+            $categoryId = null;
+        } elseif ($categoryId !== null) {
+            $categoryId = (int)$categoryId;
         }
-        return Product::all();
+        return Product::getProductsWithPrices($categoryId);
     }
-
     public function getProduct($args)
     {
         return Product::find($args['id']);

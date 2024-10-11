@@ -10,10 +10,10 @@ class Header extends React.Component {
     };
   }
 
-  handleClick = (tab) => {
+  handleClick = (tab, categoryId) => {
     this.setState({ activeTab: tab });
     if (this.props.onCategoryChange) {
-      this.props.onCategoryChange(tab);
+      this.props.onCategoryChange(categoryId);
     }
   };
 
@@ -27,7 +27,7 @@ class Header extends React.Component {
             <a
               href="#"
               className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
-              onClick={() => this.handleClick('all')}
+              onClick={() => this.handleClick('all', 'all')}
             >
               ALL
             </a>
@@ -36,7 +36,7 @@ class Header extends React.Component {
             <a
               href="#"
               className={`nav-link ${activeTab === 'clothes' ? 'active' : ''}`}
-              onClick={() => this.handleClick('clothes')}
+              onClick={() => this.handleClick('clothes', '2')}
             >
               CLOTHES
             </a>
@@ -45,7 +45,7 @@ class Header extends React.Component {
             <a
               href="#"
               className={`nav-link ${activeTab === 'tech' ? 'active' : ''}`}
-              onClick={() => this.handleClick('tech')}
+              onClick={() => this.handleClick('tech', '3')}
             >
               TECH
             </a>

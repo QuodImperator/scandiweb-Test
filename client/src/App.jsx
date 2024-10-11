@@ -7,19 +7,19 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      categoryChangeHandler: null
+      selectedCategory: 'all'
     };
   }
 
-  setCategoryChangeHandler = (handler) => {
-    this.setState({ categoryChangeHandler: handler });
+  handleCategoryChange = (categoryId) => {
+    this.setState({ selectedCategory: categoryId });
   }
 
   render() {
     return (
       <div>
-        <Header onCategoryChange={this.state.categoryChangeHandler} />
-        <ProductGrid onCategoryChange={this.setCategoryChangeHandler} />
+        <Header onCategoryChange={this.handleCategoryChange} />
+        <ProductGrid categoryId={this.state.selectedCategory} />
       </div>
     );
   }

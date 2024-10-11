@@ -4,8 +4,8 @@ import { gql } from '@apollo/client';
 import buy_icon from './assets/circle_icon.png';
 
 const GET_PRODUCTS = gql`
-  query GetProducts {
-    products {
+  query GetProducts($categoryId: String) {
+    products(categoryId: $categoryId) {
       id
       name
       inStock
@@ -52,8 +52,9 @@ class ProductCard extends React.Component {
 
 class ProductGrid extends React.Component {
     render() {
+        const { categoryId } = this.props;
         return (
-            <Query query={GET_PRODUCTS}>
+            <Query query={GET_PRODUCTS} variables={{ categoryId }}>
                 {({ loading, error, data }) => {
                     if (loading) return <p>Loading...</p>;
                     if (error) return <p>Error: {error.message}</p>;
