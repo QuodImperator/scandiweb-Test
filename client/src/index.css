@@ -27,9 +27,9 @@ li a.nav-link {
 }
 
 li a.nav-link:hover {
-  border-bottom: 2px solid #5ECE7B;
+  border-bottom: 2px solid #53d87b;
   padding-bottom: 5px;
-  color: #5ECE7B;
+  color: #53d87b;
 }
 
 .logo {
@@ -55,8 +55,8 @@ li a.cart-link:hover {
 }
 
 ul li a.nav-link.active {
-  color: #5ECE7B;
-  border-bottom: 2px solid #5ECE7B;
+  color: #53d87b;
+  border-bottom: 2px solid #53d87b;
 }
 
 .category-display {
@@ -183,15 +183,15 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #5ECE7B;
+  background-color: #53d87b;
   border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #5ECE7B;
+  background-color: #53d87b;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #5ECE7B transparent;
+  scrollbar-color: #53d87b transparent;
 }
