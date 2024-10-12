@@ -4,6 +4,7 @@ ul {
   margin: 0;
   padding-left: 100px;
   overflow: hidden;
+  caret-color: transparent;
 }
 
 li {
@@ -26,9 +27,9 @@ li a.nav-link {
 }
 
 li a.nav-link:hover {
-  border-bottom: 2px solid rgb(0, 255, 0);
+  border-bottom: 2px solid #5ECE7B;
   padding-bottom: 5px;
-  color: rgb(0, 255, 0);
+  color: #5ECE7B;
 }
 
 .logo {
@@ -54,11 +55,9 @@ li a.cart-link:hover {
 }
 
 ul li a.nav-link.active {
-  color: rgb(0, 255, 0);
-  border-bottom: 2px solid rgb(0, 255, 0);
+  color: #5ECE7B;
+  border-bottom: 2px solid #5ECE7B;
 }
-
-/* Header */
 
 .category-display {
   margin-top: 60px;
@@ -71,6 +70,7 @@ ul li a.nav-link.active {
   text-align: left;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-weight: 200;
+  caret-color: transparent;
 }
 
 /* Products */
@@ -95,6 +95,7 @@ ul li a.nav-link.active {
   width: 400px;
   height: 450px;
   box-sizing: border-box;
+  caret-color: transparent;
 }
 
 .product-card:hover {
@@ -144,7 +145,6 @@ ul li a.nav-link.active {
   position: absolute;
   bottom: 72px;
   right: 31px;
-  background-color: #5ECE7B;
   border: none;
   color: white;
   width: 52px;
@@ -168,4 +168,30 @@ ul li a.nav-link.active {
   font-size: 24px;
   font-weight: bold;
 }
-/* Products */
+
+/* Scrollbar */
+html {
+  scrollbar-gutter: stable;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #5ECE7B;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #5ECE7B;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #5ECE7B transparent;
+}
