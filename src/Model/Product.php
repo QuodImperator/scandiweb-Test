@@ -62,12 +62,31 @@ class Product extends Model
      */
     public function attributes(string $productId): array
     {
-        return $this->fetchAll("
-            SELECT a.*, pa.display_value, pa.value
+        $attributes = $this->fetchAll("
+            SELECT a.attribute_id, a.name, a.type, pa.display_value, pa.value
             FROM attributes a
             JOIN product_attributes pa ON a.attribute_id = pa.attribute_id
             WHERE pa.product_id = :product_id
         ", ['product_id' => $productId]);
+
+        $groupedAttributes = [];
+        foreach ($attributes as $attr) {
+            if (!isset($groupedAttributes[$attr['attribute_id']])) {
+                $groupedAttributes[$attr['attribute_id']] = [
+                    'id' => $attr['attribute_id'],
+                    'name' => $attr['name'],
+                    'type' => $attr['type'],
+                    'items' => []
+                ];
+            }
+            $groupedAttributes[$attr['attribute_id']]['items'][] = [
+                'displayValue' => $attr['display_value'],
+                'value' => $attr['value'],
+                'id' => $attr['value'] // Assuming the value can be used as an id
+            ];
+        }
+
+        return array_values($groupedAttributes);
     }
 
     /**
@@ -80,7 +99,7 @@ class Product extends Model
     {
         $instance = new self();
         return $instance->fetchAll("
-            SELECT p.amount, c.symbol, c.label
+            SELECT p.amount, c.symbol
             FROM prices p
             JOIN currencies c ON p.currency_code = c.currency_code
             WHERE p.product_id = :product_id

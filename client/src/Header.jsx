@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from './assets/a-logo.png';
 import cart from './assets/EmptyCart.png';
 
@@ -24,39 +25,39 @@ class Header extends React.Component {
       <div>
         <ul>
           <li>
-            <a
-              href="#"
+            <Link
+              to="/"
               className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
               onClick={() => this.handleClick('all', 'all')}
             >
               ALL
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="#"
+            <Link
+              to="/"
               className={`nav-link ${activeTab === 'clothes' ? 'active' : ''}`}
               onClick={() => this.handleClick('clothes', '2')}
             >
               CLOTHES
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="#"
+            <Link
+              to="/"
               className={`nav-link ${activeTab === 'tech' ? 'active' : ''}`}
               onClick={() => this.handleClick('tech', '3')}
             >
               TECH
-            </a>
+            </Link>
           </li>
           <li>
             <img src={logo} alt="Logo" className="logo" />
           </li>
           <li>
-            <a href="#" className="cart-link">
+            <Link to="/" className="cart-link">
               <img src={cart} alt="Cart" className="cart" />
-            </a>
+            </Link>
           </li>
         </ul>
 

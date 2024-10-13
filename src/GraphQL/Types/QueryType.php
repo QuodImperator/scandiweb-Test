@@ -23,6 +23,13 @@ class QueryType extends ObjectType
                     ],
                     'resolve' => [$resolvers, 'getProducts'],
                 ],
+                'product' => [
+                    'type' => TypeRegistry::product(),
+                    'args' => [
+                        'id' => TypeRegistry::nonNull(TypeRegistry::string()),
+                    ],
+                    'resolve' => [$resolvers, 'getProduct'],
+                ],
             ],
         ]);
     }

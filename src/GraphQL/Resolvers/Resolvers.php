@@ -37,9 +37,15 @@ class Resolvers
         }
         return Product::getProductsWithPrices($categoryId);
     }
-    public function getProduct($args)
+    
+    public function getProduct($rootValue, $args)
     {
-        return Product::find($args['id']);
+        $product = Product::find($args['id']);
+        if ($product) {
+            $product['prices'] = Product::prices($args['id']);
+            $product['attributes'] = (new Product())->attributes($args['id']);
+        }
+        return $product;
     }
 
     public function addToCart($args)

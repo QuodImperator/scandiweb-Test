@@ -195,3 +195,8 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #53d87b transparent;
 }
+
+a {
+  color:black;
+  text-decoration: none; 
+}

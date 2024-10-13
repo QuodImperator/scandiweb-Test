@@ -1,7 +1,9 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './index.css';
 import Header from './Header.jsx';
-import ProductGrid from './Products.jsx';
+import ProductGrid from './ProductGrid.jsx';
+import ProductDetails from './ProductDetails.jsx';
 
 class App extends React.Component {
   constructor(props) {
@@ -17,10 +19,15 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <Header onCategoryChange={this.handleCategoryChange} />
-        <ProductGrid categoryId={this.state.selectedCategory} />
-      </div>
+      <Router>
+        <div>
+          <Header onCategoryChange={this.handleCategoryChange} />
+          <Routes>
+            <Route path="/" element={<ProductGrid categoryId={this.state.selectedCategory} />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+          </Routes>
+        </div>
+      </Router>
     );
   }
 }

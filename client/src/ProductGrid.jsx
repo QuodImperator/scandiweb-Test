@@ -1,6 +1,7 @@
 import React from 'react';
 import { Query } from '@apollo/client/react/components';
 import { gql } from '@apollo/client';
+import { Link } from 'react-router-dom';
 import buy_icon from './assets/circle_icon.png';
 
 const GET_PRODUCTS = gql`
@@ -27,25 +28,33 @@ class ProductCard extends React.Component {
         const price = product.prices && product.prices.length > 0 ? product.prices[0] : null;
 
         return (
-            <div className="product-card">
-                <img src={product.gallery[0]} alt={product.name} className="product-image" />
-                {!product.inStock && (
-                    <div className="out-of-stock-overlay">
-                        <span className="out-of-stock">OUT OF STOCK</span>
-                    </div>
-                )}
-                <h3 className="product-name">{product.name}</h3>
-                {price ? (
-                    <p className="product-price">{price.currency.symbol}{price.amount.toFixed(2)}</p>
-                ) : (
-                    <p className="product-price">Price not available</p>
-                )}
-                {product.inStock && (
-                    <button className="add-to-cart">
-                        <img src={buy_icon} alt="Add to cart" className="cart-icon" />
-                    </button>
-                )}
-            </div>
+            <Link to={`/product/${product.id}`} className="product-card-link">
+                <div className="product-card">
+                    <img src={product.gallery[0]} alt={product.name} className="product-image" />
+                    {!product.inStock && (
+                        <div className="out-of-stock-overlay">
+                            <span className="out-of-stock">OUT OF STOCK</span>
+                        </div>
+                    )}
+                    <h3 className="product-name">{product.name}</h3>
+                    {price ? (
+                        <p className="product-price">{price.currency.symbol}{price.amount.toFixed(2)}</p>
+                    ) : (
+                        <p className="product-price">Price not available</p>
+                    )}
+                    {product.inStock && (
+                        <button 
+                            className="add-to-cart"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                console.log('Add to cart:', product.id);
+                            }}
+                        >
+                            <img src={buy_icon} alt="Add to cart" className="cart-icon" />
+                        </button>
+                    )}
+                </div>
+            </Link>
         );
     }
 }
@@ -53,6 +62,7 @@ class ProductCard extends React.Component {
 class ProductGrid extends React.Component {
     render() {
         const { categoryId } = this.props;
+
         return (
             <Query query={GET_PRODUCTS} variables={{ categoryId }}>
                 {({ loading, error, data }) => {
