@@ -68,6 +68,7 @@ class Resolvers
         }
         return $product;
     }
+
     public function addToCart($args)
     {
         $cartItem = new CartItem();
