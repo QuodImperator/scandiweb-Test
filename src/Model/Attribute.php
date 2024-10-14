@@ -18,14 +18,14 @@ class Attribute extends Model
         foreach ($attributes as $attr) {
             if (!isset($groupedAttributes[$attr['attribute_id']])) {
                 $groupedAttributes[$attr['attribute_id']] = [
-                    'id' => $attr['attribute_id'],
+                    'id' => (string)$attr['attribute_id'], // Ensure id is a string
                     'name' => $attr['name'],
                     'type' => $attr['type'],
                     'items' => []
                 ];
             }
             $groupedAttributes[$attr['attribute_id']]['items'][] = [
-                'id' => $attr['value'],
+                'id' => $attr['value'], // Use value as id, which is already a string
                 'displayValue' => $attr['display_value'],
                 'value' => $attr['value']
             ];

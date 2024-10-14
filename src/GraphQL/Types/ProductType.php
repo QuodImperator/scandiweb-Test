@@ -4,6 +4,7 @@ namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use App\Model\Category;
+use App\Model\Attribute;
 
 class ProductType extends ObjectType
 {
@@ -44,6 +45,12 @@ class ProductType extends ObjectType
                         'type' => TypeRegistry::listOf(TypeRegistry::price()),
                         'resolve' => function ($product) {
                             return $product['prices'];
+                        }
+                    ],
+                    'attributes' => [
+                        'type' => TypeRegistry::listOf(TypeRegistry::attribute()),
+                        'resolve' => function ($product) {
+                            return Attribute::getByProductId($product['product_id']);
                         }
                     ],
                 ];

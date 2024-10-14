@@ -12,7 +12,7 @@ class AttributeItemType extends ObjectType
             'name' => 'AttributeItem',
             'fields' => function() {
                 return [
-                    'id' => TypeRegistry::nonNull(TypeRegistry::int()),
+                    'id' => TypeRegistry::nonNull(TypeRegistry::string()),
                     'displayValue' => TypeRegistry::nonNull(TypeRegistry::string()),
                     'value' => TypeRegistry::nonNull(TypeRegistry::string()),
                 ];

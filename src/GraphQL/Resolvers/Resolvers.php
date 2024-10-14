@@ -6,6 +6,7 @@ use App\Model\Category;
 use App\Model\Product;
 use App\Model\CartItem;
 use App\Model\Order;
+use App\Model\Attribute;
 
 class Resolvers
 {
@@ -65,6 +66,7 @@ class Resolvers
                     ]
                 ];
             }, $product['prices']);
+            $product['attributes'] = Attribute::getByProductId($product['product_id']);
         }
         return $product;
     }
