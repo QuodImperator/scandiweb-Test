@@ -6,20 +6,8 @@ use PDO;
 use InvalidArgumentException;
 use Exception;
 
-/**
- * Order Model
- * 
- * This class represents the Order entity and provides methods to interact with the orders table.
- */
 class Order extends Model
 {
-    /**
-     * Find an order by its ID
-     *
-     * @param int $id
-     * @return array|null
-     * @throws InvalidArgumentException
-     */
     public static function find(int $id): ?array
     {
         if ($id <= 0) {
@@ -30,13 +18,6 @@ class Order extends Model
         return $instance->fetch("SELECT * FROM orders WHERE order_id = :id", ['id' => $id]);
     }
 
-    /**
-     * Save a new order
-     *
-     * @param array $data
-     * @return int The ID of the newly created order
-     * @throws InvalidArgumentException|Exception
-     */
     public function save(array $data): int
     {
         if (empty($data['total_amount']) || empty($data['currency_code']) || empty($data['status']) || empty($data['items'])) {
@@ -80,13 +61,6 @@ class Order extends Model
         }
     }
 
-    /**
-     * Get items for an order
-     *
-     * @param int $orderId
-     * @return array
-     * @throws InvalidArgumentException
-     */
     public function items(int $orderId): array
     {
         if ($orderId <= 0) {

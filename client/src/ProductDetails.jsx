@@ -52,7 +52,9 @@ class ProductDetailsContent extends React.Component {
           
           <div className="product-price">
             <h3>Price:</h3>
-            <p>{product.prices[0].currency.symbol}{product.prices[0].amount.toFixed(2)}</p>
+            {product.prices.map((price, index) => (
+              <p key={index}>{price.currency.symbol}{price.amount.toFixed(2)}</p>
+            ))}
           </div>
           
           <p className="product-stock">
@@ -88,7 +90,7 @@ const ProductDetails = () => {
         if (loading) return <div className="loading">Loading...</div>;
         if (error) return <div className="error">Error: {error.message}</div>;
 
-        const product = data.products[0]; // Assuming the query returns an array
+        const product = data.product;
         if (!product) return <div className="error">Product not found</div>;
 
         return <ProductDetailsContent product={product} />;

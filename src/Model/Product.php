@@ -5,31 +5,8 @@ namespace App\Model;
 use PDO;
 use InvalidArgumentException;
 
-/**
- * Product Model
- * 
- * This class represents the Product entity and provides methods to interact with the products table.
- */
 class Product extends Model
 {
-    /**
-     * Retrieve all products
-     *
-     * @return array
-     */
-    public static function all(): array
-    {
-        $instance = new self();
-        return $instance->fetchAll("SELECT * FROM products");
-    }
-
-    /**
-     * Find a product by its ID
-     *
-     * @param string $id
-     * @return array|null
-     * @throws InvalidArgumentException
-     */
     public static function find(string $id): ?array
     {
         if (empty($id)) {
@@ -37,29 +14,17 @@ class Product extends Model
         }
 
         $instance = new self();
-        return $instance->fetch("SELECT * FROM products WHERE product_id = :id", ['id' => $id]);
+        $product = $instance->fetch("SELECT * FROM products WHERE product_id = :id", ['id' => $id]);
+        
+        if ($product) {
+            $product['prices'] = self::prices($id);
+            $product['attributes'] = $instance->attributes($id);
+            $product['category'] = Category::find($product['category_id']);
+        }
+        
+        return $product;
     }
 
-    /**
-     * Find products by a specific column value
-     *
-     * @param string $column
-     * @param mixed $value
-     * @return array
-     * @throws InvalidArgumentException
-     */
-    public static function where(string $column, $value): array
-    {
-        $instance = new self();
-        return $instance->fetchAll("SELECT * FROM products WHERE $column = :value", ['value' => $value]);
-    }
-
-    /**
-     * Get attributes for a product
-     *
-     * @param string $productId
-     * @return array
-     */
     public function attributes(string $productId): array
     {
         $attributes = $this->fetchAll("
@@ -89,38 +54,24 @@ class Product extends Model
         return array_values($groupedAttributes);
     }
 
-    /**
-     * Get prices for a product
-     *
-     * @param string $productId
-     * @return array
-     */
     public static function prices($productId)
     {
         $instance = new self();
         return $instance->fetchAll("
-            SELECT p.amount, c.symbol
+            SELECT p.amount, c.symbol, c.currency_code as label
             FROM prices p
             JOIN currencies c ON p.currency_code = c.currency_code
             WHERE p.product_id = :product_id
         ", ['product_id' => $productId]);
     }
 
-    /**
-     * Get products with prices
-     *
-     * @param string|null $categoryId
-     * @return array
-     */
     public static function getProductsWithPrices($categoryId = null)
     {
         $instance = new self();
         $query = "
-            SELECT p.*, 
-                   GROUP_CONCAT(CONCAT(pr.amount, ':', c.symbol) SEPARATOR '|') as prices
+            SELECT p.*, c.name as category_name
             FROM products p
-            LEFT JOIN prices pr ON p.product_id = pr.product_id
-            LEFT JOIN currencies c ON pr.currency_code = c.currency_code
+            LEFT JOIN categories c ON p.category_id = c.category_id
         ";
         
         $params = [];
@@ -129,24 +80,13 @@ class Product extends Model
             $params['category_id'] = $categoryId;
         }
         
-        $query .= " GROUP BY p.product_id";
-        
         $products = $instance->fetchAll($query, $params);
         
-        // Process the prices
         foreach ($products as &$product) {
-            $pricesArray = [];
-            if ($product['prices']) {
-                $pricesStrings = explode('|', $product['prices']);
-                foreach ($pricesStrings as $priceString) {
-                    list($amount, $symbol) = explode(':', $priceString);
-                    $pricesArray[] = [
-                        'amount' => (float)$amount,
-                        'currency' => ['symbol' => $symbol]
-                    ];
-                }
-            }
-            $product['prices'] = $pricesArray;
+            $product['prices'] = self::prices($product['product_id']);
+            $product['attributes'] = $instance->attributes($product['product_id']);
+            $product['category'] = ['name' => $product['category_name']];
+            unset($product['category_name']);
         }
         
         return $products;

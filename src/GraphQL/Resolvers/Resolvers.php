@@ -35,26 +35,46 @@ class Resolvers
         } elseif ($categoryId !== null) {
             $categoryId = (int)$categoryId;
         }
-        return Product::getProductsWithPrices($categoryId);
+        $products = Product::getProductsWithPrices($categoryId);
+
+        foreach ($products as &$product) {
+            $product['prices'] = array_map(function ($price) {
+                return [
+                    'amount' => (float)$price['amount'],
+                    'currency' => [
+                        'symbol' => $price['symbol'],
+                        'label' => $price['label']
+                    ]
+                ];
+            }, $product['prices']);
+        }
+
+        return $products;
     }
-    
+
     public function getProduct($rootValue, $args)
     {
         $product = Product::find($args['id']);
         if ($product) {
-            $product['prices'] = Product::prices($args['id']);
-            $product['attributes'] = (new Product())->attributes($args['id']);
+            $product['prices'] = array_map(function ($price) {
+                return [
+                    'amount' => (float)$price['amount'],
+                    'currency' => [
+                        'symbol' => $price['symbol'],
+                        'label' => $price['label']
+                    ]
+                ];
+            }, $product['prices']);
         }
         return $product;
     }
-
     public function addToCart($args)
     {
         $cartItem = new CartItem();
         $id = $cartItem->save([
             'product_id' => $args['productId'],
             'quantity' => 1,
-            'attribute_values' => array_map(function($attr) {
+            'attribute_values' => array_map(function ($attr) {
                 return ['id' => $attr['id'], 'value' => $attr['value']];
             }, $args['attributeValues'])
         ]);

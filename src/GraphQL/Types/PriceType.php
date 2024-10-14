@@ -12,7 +12,7 @@ class PriceType extends ObjectType
             'name' => 'Price',
             'fields' => [
                 'amount' => TypeRegistry::nonNull(TypeRegistry::float()),
-                'currency' => TypeRegistry::nonNull(TypeRegistry::currency()),
+                'currency' => TypeRegistry::currency(),
             ],
         ]);
     }
