@@ -200,3 +200,114 @@ a {
   color:black;
   text-decoration: none; 
 }
+
+/* Product Details Page */
+.product-details {
+  display: flex;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  caret-color: transparent;
+}
+
+.product-gallery {
+  flex: 1;
+  margin-right: 40px;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-details .product-name {
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.product-details .product-brand {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.product-details .product-price {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 24px 0;
+}
+
+.product-attribute {
+  margin-bottom: 24px;
+}
+
+.product-attribute h3 {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.attribute-options {
+  display: flex;
+  gap: 8px;
+}
+
+.attribute-option {
+  min-width: 63px;
+  height: 45px;
+  border: 1px solid #1D1F22;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: white;
+}
+
+.attribute-option.selected {
+  background-color: #1D1F22;
+  color: white;
+}
+
+.attribute-option[style] {
+  width: 32px;
+  height: 32px;
+  min-width: unset;
+}
+
+.attribute-option[style].selected {
+  outline: 2px solid #53d87b;
+  outline-offset: 1px;
+}
+
+.product-details .add-to-cart {
+  width: 100%;
+  padding: 16px;
+  background-color: #53d87b;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: static;
+  opacity: 1;
+  border-radius: 0;
+  height: auto;
+}
+
+.product-details .add-to-cart:disabled {
+  background-color: #A6A6A6;
+  cursor: not-allowed;
+}
+
+.product-description {
+  margin-top: 40px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 159.96%;
+}
