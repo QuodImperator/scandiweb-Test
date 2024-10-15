@@ -4,6 +4,7 @@ import './index.css';
 import Header from './Header.jsx';
 import ProductGrid from './ProductGrid.jsx';
 import ProductDetails from './ProductDetails.jsx';
+import BodyClassHandlerWrapper from './BodyClassHandler.jsx';
 
 class App extends React.Component {
   constructor(props) {
@@ -20,6 +21,7 @@ class App extends React.Component {
   render() {
     return (
       <Router>
+        <BodyClassHandlerWrapper />
         <div>
           <Header onCategoryChange={this.handleCategoryChange} />
           <Routes>

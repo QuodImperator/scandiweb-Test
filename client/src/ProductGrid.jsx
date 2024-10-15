@@ -66,7 +66,7 @@ class ProductGrid extends React.Component {
         return (
             <Query query={GET_PRODUCTS} variables={{ categoryId }}>
                 {({ loading, error, data }) => {
-                    if (loading) return <p>Loading...</p>;
+                    if (loading) return <p></p>;
                     if (error) return <p>Error: {error.message}</p>;
 
                     return (

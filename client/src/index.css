@@ -211,6 +211,10 @@ a {
   caret-color: transparent;
 }
 
+body.product-details-active .category-display h1 {
+  display: none;
+}
+
 .product-gallery {
   flex: 1;
   margin-right: 40px;
