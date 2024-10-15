@@ -225,9 +225,10 @@ body.product-details-active .category-display h1 {
 }
 
 .product-details .product-name {
-  font-size: 30px;
-  font-weight: 600;
+  font-size: 34px;
+  font-weight: 400;
   margin-bottom: 16px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .product-details .product-brand {
@@ -241,17 +242,20 @@ body.product-details-active .category-display h1 {
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 8px;
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 .product-details .product-price h3:after,
 .product-attribute h3:after {
   content: ':';
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 .product-details .product-price p {
   font-size: 24px;
   font-weight: 700;
   margin: 8px 0 24px;
+  font-family: 'Raleway', sans-serif;
 }
 
 .product-attribute {
@@ -267,7 +271,7 @@ body.product-details-active .category-display h1 {
   min-width: 63px;
   height: 45px;
   border: 1px solid #1D1F22;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Roboto Condensed', sans-serif;
   font-weight: 400;
   font-size: 16px;
   display: flex;
@@ -300,7 +304,8 @@ body.product-details-active .category-display h1 {
   border: none;
   color: white;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-transform: uppercase;
   cursor: pointer;
   position: static;
@@ -316,7 +321,7 @@ body.product-details-active .category-display h1 {
 
 .product-description {
   margin-top: 40px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 159.96%;

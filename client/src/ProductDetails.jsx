@@ -97,10 +97,6 @@ class ProductDetailsContent extends React.Component {
             ))}
           </div>
           
-          <p className="product-stock">
-            {product.inStock ? 'In Stock' : 'Out of Stock'}
-          </p>
-          
           <button
             className="add-to-cart"
             disabled={!product.inStock}
