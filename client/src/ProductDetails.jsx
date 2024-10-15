@@ -72,9 +72,6 @@ class ProductDetailsContent extends React.Component {
         </div>
         <div className="product-info">
           <h1 className="product-name">{product.name}</h1>
-          <p className="product-brand">Brand: {product.brand}</p>
-          <p className="product-category">Category: {product.category.name}</p>
-          
           {product.attributes.map(attribute => (
             <div key={attribute.id} className="product-attribute">
               <h3>{attribute.name}</h3>
@@ -94,7 +91,7 @@ class ProductDetailsContent extends React.Component {
           ))}
           
           <div className="product-price">
-            <h3>Price:</h3>
+            <h3>Price</h3>
             {product.prices.map((price, index) => (
               <p key={index}>{price.currency.symbol}{price.amount.toFixed(2)}</p>
             ))}

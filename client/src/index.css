@@ -231,21 +231,27 @@ a {
   margin-bottom: 8px;
 }
 
-.product-details .product-price {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 24px 0;
-}
-
-.product-attribute {
-  margin-bottom: 24px;
-}
-
+.product-details .product-price h3,
 .product-attribute h3 {
   font-size: 18px;
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 8px;
+}
+
+.product-details .product-price h3:after,
+.product-attribute h3:after {
+  content: ':';
+}
+
+.product-details .product-price p {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 8px 0 24px;
+}
+
+.product-attribute {
+  margin-bottom: 24px;
 }
 
 .attribute-options {
