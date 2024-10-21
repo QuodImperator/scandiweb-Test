@@ -17,14 +17,23 @@ class ProductDetailsContent extends React.Component {
   getInitialSelectedAttributes() {
     const { product, cartItems } = this.props;
     const cartItem = cartItems.find(item => item.id === product.id);
-    if (cartItem) {
-      return cartItem.selectedAttributes;
+    if (cartItem && cartItem.selectedAttributes) {
+      return Object.keys(cartItem.selectedAttributes).reduce((acc, key) => {
+        const attribute = product.attributes.find(attr => attr.name === key);
+        if (attribute) {
+          const item = attribute.items.find(item => item.value === cartItem.selectedAttributes[key]);
+          if (item) {
+            acc[attribute.id] = item.id;
+          }
+        }
+        return acc;
+      }, {});
     }
     return {};
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.cartItems !== this.props.cartItems) {
+    if (prevProps.cartItems !== this.props.cartItems || prevProps.product !== this.props.product) {
       this.setState({
         selectedAttributes: this.getInitialSelectedAttributes()
       });
@@ -66,8 +75,27 @@ class ProductDetailsContent extends React.Component {
     return product.attributes.every(attribute => selectedAttributes.hasOwnProperty(attribute.id));
   }
 
-  render() {
+  handleAddToCart = () => {
     const { product, addToCart } = this.props;
+    const { selectedAttributes } = this.state;
+
+    // Convert selectedAttributes to the format expected by the cart
+    const cartAttributes = Object.keys(selectedAttributes).reduce((acc, attributeId) => {
+      const attribute = product.attributes.find(attr => attr.id === attributeId);
+      if (attribute) {
+        const item = attribute.items.find(item => item.id === selectedAttributes[attributeId]);
+        if (item) {
+          acc[attribute.name] = item.value;
+        }
+      }
+      return acc;
+    }, {});
+
+    addToCart(product, cartAttributes);
+  }
+
+  render() {
+    const { product } = this.props;
     const { selectedImageIndex, selectedAttributes } = this.state;
     const isAddToCartDisabled = !product.inStock || !this.areAllAttributesSelected();
 
@@ -123,7 +151,7 @@ class ProductDetailsContent extends React.Component {
           <button
             className="add-to-cart"
             disabled={isAddToCartDisabled}
-            onClick={() => addToCart(product, selectedAttributes)}
+            onClick={this.handleAddToCart}
           >
             {product.inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
