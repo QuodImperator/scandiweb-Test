@@ -1,70 +1,78 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from './assets/a-logo.png';
-import cart from './assets/EmptyCart.png';
+import CartOverlay from './CartOverlay';
+import CartContext from './CartContext';
+import cart_icon from './assets/EmptyCart.png';
 
 class Header extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeTab: 'all',
-    };
-  }
+  static contextType = CartContext;
+
+  state = {
+    activeTab: 'All',
+    isCartOpen: false
+  };
 
   handleClick = (tab, categoryId) => {
     this.setState({ activeTab: tab });
-    if (this.props.onCategoryChange) {
-      this.props.onCategoryChange(categoryId);
-    }
+    this.props.onCategoryChange(categoryId);
+  };
+
+  toggleCart = (e) => {
+    e.preventDefault();
+    this.setState(prevState => ({ isCartOpen: !prevState.isCartOpen }));
   };
 
   render() {
-    const { activeTab } = this.state;
+    const { activeTab, isCartOpen } = this.state;
+    const { cartItems } = this.context;
 
     return (
-      <div>
-        <ul>
-          <li>
-            <Link
-              to="/"
-              className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
-              onClick={() => this.handleClick('all', 'all')}
-            >
-              ALL
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/"
-              className={`nav-link ${activeTab === 'clothes' ? 'active' : ''}`}
-              onClick={() => this.handleClick('clothes', '2')}
-            >
-              CLOTHES
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/"
-              className={`nav-link ${activeTab === 'tech' ? 'active' : ''}`}
-              onClick={() => this.handleClick('tech', '3')}
-            >
-              TECH
-            </Link>
-          </li>
-          <li>
-            <img src={logo} alt="Logo" className="logo" />
-          </li>
-          <li>
-            <Link to="/" className="cart-link">
-              <img src={cart} alt="Cart" className="cart" />
-            </Link>
-          </li>
-        </ul>
-
+      <>
+        <header className="main-header">
+          <nav>
+            <ul>
+              <li>
+                <Link
+                  to="/"
+                  className={`nav-link ${activeTab === 'All' ? 'active' : ''}`}
+                  onClick={() => this.handleClick('All', 'all')}
+                >
+                  ALL
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  className={`nav-link ${activeTab === 'Clothes' ? 'active' : ''}`}
+                  onClick={() => this.handleClick('Clothes', '2')}
+                >
+                  CLOTHES
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  className={`nav-link ${activeTab === 'Tech' ? 'active' : ''}`}
+                  onClick={() => this.handleClick('Tech', '3')}
+                >
+                  TECH
+                </Link>
+              </li>
+            </ul>
+          </nav>
+          <div className="cart-wrapper">
+            <div className="cart-icon" onClick={this.toggleCart}>
+              <img src={cart_icon} alt="Cart" />
+              {cartItems.length > 0 && <span className="cart-count">{cartItems.length}</span>}
+            </div>
+          </div>
+        </header>
         <div className="category-display">
-          <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
+          <h1>{activeTab}</h1>
         </div>
-      </div>
+        <CartOverlay isOpen={isCartOpen} onClose={this.toggleCart} />
+        {isCartOpen && <div className="cart-overlay-wrapper" onClick={this.toggleCart}></div>}
+      </>
     );
   }
 }

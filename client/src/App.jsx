@@ -1,35 +1,40 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import './index.css';
-import Header from './Header.jsx';
-import ProductGrid from './ProductGrid.jsx';
-import ProductDetails from './ProductDetails.jsx';
-import BodyClassHandlerWrapper from './BodyClassHandler.jsx';
+import Header from './Header';
+import ProductGrid from './ProductGrid';
+import ProductDetails from './ProductDetails';
+import { CartProvider } from './CartContext';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedCategory: 'all'
-    };
-  }
+  state = {
+    selectedCategory: 'all'
+  };
 
   handleCategoryChange = (categoryId) => {
     this.setState({ selectedCategory: categoryId });
-  }
+  };
 
   render() {
     return (
-      <Router>
-        <BodyClassHandlerWrapper />
-        <div>
-          <Header onCategoryChange={this.handleCategoryChange} />
-          <Routes>
-            <Route path="/" element={<ProductGrid categoryId={this.state.selectedCategory} />} />
-            <Route path="/product/:id" element={<ProductDetails />} />
-          </Routes>
-        </div>
-      </Router>
+      <CartProvider>
+        <Router>
+          <div className="App">
+            <Header onCategoryChange={this.handleCategoryChange} />
+            <div className="main-content">
+              <Routes>
+                <Route 
+                  path="/" 
+                  element={<ProductGrid categoryId={this.state.selectedCategory} />} 
+                />
+                <Route 
+                  path="/product/:id" 
+                  element={<ProductDetails />} 
+                />
+              </Routes>
+            </div>
+          </div>
+        </Router>
+      </CartProvider>
     );
   }
 }

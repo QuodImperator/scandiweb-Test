@@ -1,39 +1,8 @@
 import React from 'react';
 import { Query } from '@apollo/client/react/components';
-import { gql } from '@apollo/client';
-import { useParams } from 'react-router-dom';
-
-const GET_PRODUCT = gql`
-  query GetProduct($id: String!) {
-    product(id: $id) {
-      id
-      name
-      inStock
-      gallery
-      description
-      category {
-        name
-      }
-      prices {
-        amount
-        currency {
-          symbol
-        }
-      }
-      brand
-      attributes {
-        id
-        name
-        type
-        items {
-          id
-          displayValue
-          value
-        }
-      }
-    }
-  }
-`;
+import { GET_PRODUCT } from './queries';
+import { CartConsumer } from './CartContext';
+import { WithRouter } from './WithRouter';
 
 class ProductDetailsContent extends React.Component {
   constructor(props) {
@@ -75,7 +44,7 @@ class ProductDetailsContent extends React.Component {
   }
 
   render() {
-    const { product } = this.props;
+    const { product, addToCart } = this.props;
     const { selectedImageIndex } = this.state;
 
     return (
@@ -130,7 +99,7 @@ class ProductDetailsContent extends React.Component {
           <button
             className="add-to-cart"
             disabled={!product.inStock}
-            onClick={() => console.log('Add to cart:', product.id, this.state.selectedAttributes)}
+            onClick={() => addToCart(product, this.state.selectedAttributes)}
           >
             {product.inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
@@ -145,9 +114,9 @@ class ProductDetailsContent extends React.Component {
   }
 }
 
-class ProductDetailsClass extends React.Component {
+class ProductDetails extends React.Component {
   render() {
-    const { id } = this.props;
+    const { id } = this.props.router.params;
 
     return (
       <Query query={GET_PRODUCT} variables={{ id }}>
@@ -158,17 +127,17 @@ class ProductDetailsClass extends React.Component {
           const product = data.product;
           if (!product) return <div className="error">Product not found</div>;
 
-          return <ProductDetailsContent product={product} />;
+          return (
+            <CartConsumer>
+              {({ addToCart }) => (
+                <ProductDetailsContent product={product} addToCart={addToCart} />
+              )}
+            </CartConsumer>
+          );
         }}
       </Query>
     );
   }
 }
 
-// Wrapper functional component to use the useParams hook
-function ProductDetails() {
-  const { id } = useParams();
-  return <ProductDetailsClass id={id} />;
-}
-
-export default ProductDetails;
+export default WithRouter(ProductDetails);
