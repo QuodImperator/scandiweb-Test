@@ -8,10 +8,27 @@ class ProductDetailsContent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedAttributes: {},
+      selectedAttributes: this.getInitialSelectedAttributes(),
       selectedImageIndex: 0,
       isHoveringImage: false
     };
+  }
+
+  getInitialSelectedAttributes() {
+    const { product, cartItems } = this.props;
+    const cartItem = cartItems.find(item => item.id === product.id);
+    if (cartItem) {
+      return cartItem.selectedAttributes;
+    }
+    return {};
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.cartItems !== this.props.cartItems) {
+      this.setState({
+        selectedAttributes: this.getInitialSelectedAttributes()
+      });
+    }
   }
 
   handleAttributeChange = (attributeId, itemId) => {
@@ -43,9 +60,16 @@ class ProductDetailsContent extends React.Component {
     this.setState({ isHoveringImage: isHovering });
   }
 
+  areAllAttributesSelected = () => {
+    const { product } = this.props;
+    const { selectedAttributes } = this.state;
+    return product.attributes.every(attribute => selectedAttributes.hasOwnProperty(attribute.id));
+  }
+
   render() {
     const { product, addToCart } = this.props;
-    const { selectedImageIndex } = this.state;
+    const { selectedImageIndex, selectedAttributes } = this.state;
+    const isAddToCartDisabled = !product.inStock || !this.areAllAttributesSelected();
 
     return (
       <div className="product-details">
@@ -78,7 +102,7 @@ class ProductDetailsContent extends React.Component {
                 {attribute.items.map(item => (
                   <button
                     key={item.id}
-                    className={`attribute-option ${this.state.selectedAttributes[attribute.id] === item.id ? 'selected' : ''}`}
+                    className={`attribute-option ${selectedAttributes[attribute.id] === item.id ? 'selected' : ''}`}
                     onClick={() => this.handleAttributeChange(attribute.id, item.id)}
                     style={attribute.type === 'swatch' ? { backgroundColor: item.value } : {}}
                   >
@@ -98,8 +122,8 @@ class ProductDetailsContent extends React.Component {
 
           <button
             className="add-to-cart"
-            disabled={!product.inStock}
-            onClick={() => addToCart(product, this.state.selectedAttributes)}
+            disabled={isAddToCartDisabled}
+            onClick={() => addToCart(product, selectedAttributes)}
           >
             {product.inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
@@ -129,8 +153,8 @@ class ProductDetails extends React.Component {
 
           return (
             <CartConsumer>
-              {({ addToCart }) => (
-                <ProductDetailsContent product={product} addToCart={addToCart} />
+              {({ addToCart, cartItems }) => (
+                <ProductDetailsContent product={product} addToCart={addToCart} cartItems={cartItems} />
               )}
             </CartConsumer>
           );
