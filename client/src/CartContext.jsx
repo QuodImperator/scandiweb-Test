@@ -7,6 +7,18 @@ export class CartProvider extends React.Component {
     cartItems: []
   };
 
+  componentDidMount() {
+    // Load cart items from localStorage
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      this.setState({ cartItems: JSON.parse(savedCart) });
+    }
+  }
+
+  saveCart = (cartItems) => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }
+
   addToCart = (product, selectedAttributes) => {
     this.setState(prevState => {
       const existingItem = prevState.cartItems.find(item => 
@@ -14,34 +26,56 @@ export class CartProvider extends React.Component {
         JSON.stringify(item.selectedAttributes) === JSON.stringify(selectedAttributes)
       );
 
+      let newCartItems;
       if (existingItem) {
-        return {
-          cartItems: prevState.cartItems.map(item => 
-            item === existingItem 
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          )
-        };
+        newCartItems = prevState.cartItems.map(item => 
+          item === existingItem 
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       } else {
-        return {
-          cartItems: [...prevState.cartItems, { ...product, quantity: 1, selectedAttributes }]
-        };
+        newCartItems = [...prevState.cartItems, { ...product, quantity: 1, selectedAttributes }];
       }
+
+      this.saveCart(newCartItems);
+      return { cartItems: newCartItems };
     });
   };
 
   removeFromCart = (itemToRemove) => {
-    this.setState(prevState => ({
-      cartItems: prevState.cartItems.filter(item => item !== itemToRemove)
-    }));
+    this.setState(prevState => {
+      const newCartItems = prevState.cartItems.filter(item => item !== itemToRemove);
+      this.saveCart(newCartItems);
+      return { cartItems: newCartItems };
+    });
   };
 
   updateItemQuantity = (item, newQuantity) => {
-    this.setState(prevState => ({
-      cartItems: prevState.cartItems.map(cartItem => 
+    this.setState(prevState => {
+      const newCartItems = prevState.cartItems.map(cartItem => 
         cartItem === item ? { ...cartItem, quantity: newQuantity } : cartItem
-      )
-    }));
+      );
+      this.saveCart(newCartItems);
+      return { cartItems: newCartItems };
+    });
+  };
+
+  updateItemAttributes = (item, attributeName, attributeValue) => {
+    this.setState(prevState => {
+      const newCartItems = prevState.cartItems.map(cartItem => 
+        cartItem === item
+          ? {
+              ...cartItem,
+              selectedAttributes: {
+                ...cartItem.selectedAttributes,
+                [attributeName]: attributeValue
+              }
+            }
+          : cartItem
+      );
+      this.saveCart(newCartItems);
+      return { cartItems: newCartItems };
+    });
   };
 
   getTotalPrice = () => {
@@ -54,6 +88,7 @@ export class CartProvider extends React.Component {
       addToCart: this.addToCart,
       removeFromCart: this.removeFromCart,
       updateItemQuantity: this.updateItemQuantity,
+      updateItemAttributes: this.updateItemAttributes,
       getTotalPrice: this.getTotalPrice
     };
 

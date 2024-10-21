@@ -25,6 +25,7 @@ class Header extends React.Component {
   render() {
     const { activeTab, isCartOpen } = this.state;
     const { cartItems } = this.context;
+    const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     return (
       <>
@@ -61,15 +62,12 @@ class Header extends React.Component {
             </ul>
           </nav>
           <div className="cart-wrapper">
-            <div className="cart-icon" onClick={this.toggleCart}>
+            <div className="cart-icon" onClick={this.toggleCart} data-testid="cart-btn">
               <img src={cart_icon} alt="Cart" />
-              {cartItems.length > 0 && <span className="cart-count">{cartItems.length}</span>}
+              {itemCount > 0 && <span className="cart-count">{itemCount}</span>}
             </div>
           </div>
         </header>
-        <div className="category-display">
-          <h1>{activeTab}</h1>
-        </div>
         <CartOverlay isOpen={isCartOpen} onClose={this.toggleCart} />
         {isCartOpen && <div className="cart-overlay-wrapper" onClick={this.toggleCart}></div>}
       </>

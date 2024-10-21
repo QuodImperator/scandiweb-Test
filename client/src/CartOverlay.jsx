@@ -9,10 +9,10 @@ class CartOverlay extends React.Component {
 
     return (
       <CartConsumer>
-        {({ cartItems, removeFromCart, updateItemQuantity, getTotalPrice }) => (
+        {({ cartItems, removeFromCart, updateItemQuantity, getTotalPrice, updateItemAttributes }) => (
           <div className="cart-overlay active">
             <div className="cart-content">
-              <h2>My Bag, {cartItems.length} items</h2>
+              <h2>My Bag, {cartItems.length === 1 ? '1 item' : `${cartItems.length} items`}</h2>
               {cartItems.map((item, index) => (
                 <div key={index} className="cart-item">
                   <div className="item-details">
@@ -27,6 +27,7 @@ class CartOverlay extends React.Component {
                               key={option.id}
                               className={`attribute-option ${item.selectedAttributes[attr.name] === option.value ? 'selected' : ''}`}
                               style={attr.type === 'swatch' ? { backgroundColor: option.value } : {}}
+                              onClick={() => updateItemAttributes(item, attr.name, option.value)}
                             >
                               {attr.type !== 'swatch' && option.value}
                             </button>
@@ -38,7 +39,13 @@ class CartOverlay extends React.Component {
                   <div className="item-actions">
                     <button onClick={() => updateItemQuantity(item, item.quantity + 1)}>+</button>
                     <span>{item.quantity}</span>
-                    <button onClick={() => updateItemQuantity(item, Math.max(0, item.quantity - 1))}>-</button>
+                    <button onClick={() => {
+                      if (item.quantity === 1) {
+                        removeFromCart(item);
+                      } else {
+                        updateItemQuantity(item, item.quantity - 1);
+                      }
+                    }}>-</button>
                   </div>
                   <img src={item.gallery[0]} alt={item.name} className="item-image" />
                 </div>
@@ -48,13 +55,19 @@ class CartOverlay extends React.Component {
                 <p>${getTotalPrice().toFixed(2)}</p>
               </div>
               <div className="cart-buttons">
-                <button className="checkout-btn">CHECK OUT</button>
+                <button className="checkout-btn" onClick={this.handlePlaceOrder}>
+                  PLACE ORDER
+                </button>
               </div>
             </div>
           </div>
         )}
       </CartConsumer>
     );
+  }
+
+  handlePlaceOrder = () => {
+    console.log('Place order clicked');
   }
 }
 
