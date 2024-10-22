@@ -173,7 +173,7 @@ class ProductDetails extends React.Component {
     return (
       <Query query={GET_PRODUCT} variables={{ id }}>
         {({ loading, error, data }) => {
-          if (loading) return <div className="loading">Loading...</div>;
+          if (loading) return <div className="loading"></div>;
           if (error) return <div className="error">Error: {error.message}</div>;
 
           const product = data.product;

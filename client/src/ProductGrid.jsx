@@ -86,6 +86,19 @@ class ProductCard extends React.Component {
 }
 
 class ProductGrid extends React.Component {
+    getCategoryName(categoryId) {
+        switch(categoryId) {
+            case 'all':
+                return 'All';
+            case '2':
+                return 'Women';
+            case '3':
+                return 'Tech';
+            default:
+                return 'All';
+        }
+    }
+
     render() {
         const { categoryId } = this.props;
 
@@ -95,14 +108,21 @@ class ProductGrid extends React.Component {
                     if (loading) return <p></p>;
                     if (error) return <p>Error: {error.message}</p>;
 
+                    const categoryName = this.getCategoryName(categoryId);
+
                     return (
-                        <div className="product-container">
-                            <div className="product-grid">
-                                {data.products.map(product => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))}
+                        <>
+                            <div className="category-display">
+                                <h1>{categoryName}</h1>
                             </div>
-                        </div>
+                            <div className="product-container">
+                                <div className="product-grid">
+                                    {data.products.map(product => (
+                                        <ProductCard key={product.id} product={product} />
+                                    ))}
+                                </div>
+                            </div>
+                        </>
                     );
                 }}
             </Query>
