@@ -1,5 +1,20 @@
 import React from 'react';
 import { CartConsumer } from './CartContext';
+import { useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+
+const PLACE_ORDER = gql`
+  mutation PlaceOrder($items: [CartItemInput!]!, $totalAmount: Float!, $currencyCode: String!) {
+    placeOrder(items: $items, totalAmount: $totalAmount, currencyCode: $currencyCode) {
+      order_id
+      total_amount
+      currency_code
+      status
+      created_at
+      updated_at
+    }
+  }
+`;
 
 class CartOverlay extends React.Component {
   render() {
@@ -9,7 +24,7 @@ class CartOverlay extends React.Component {
 
     return (
       <CartConsumer>
-        {({ cartItems, removeFromCart, updateItemQuantity, getTotalPrice, updateItemAttributes }) => (
+        {({ cartItems, removeFromCart, updateItemQuantity, updateItemAttributes, getTotalPrice, clearCart }) => (
           <div className="cart-overlay active">
             <div className="cart-content">
               <h2>My Bag, {cartItems.length === 1 ? '1 item' : `${cartItems.length} items`}</h2>
@@ -50,14 +65,19 @@ class CartOverlay extends React.Component {
                   <img src={item.gallery[0]} alt={item.name} className="item-image" />
                 </div>
               ))}
+
               <div className="cart-total">
                 <h3>Total</h3>
                 <p>${getTotalPrice().toFixed(2)}</p>
               </div>
+
               <div className="cart-buttons">
-                <button className="checkout-btn" onClick={this.handlePlaceOrder}>
-                  PLACE ORDER
-                </button>
+                <PlaceOrderButton
+                  cartItems={cartItems}
+                  getTotalPrice={getTotalPrice}
+                  clearCart={clearCart}
+                  disabled={cartItems.length === 0}
+                />
               </div>
             </div>
           </div>
@@ -65,10 +85,61 @@ class CartOverlay extends React.Component {
       </CartConsumer>
     );
   }
+}
 
-  handlePlaceOrder = () => {
-    console.log('Place order clicked');
-  }
+
+function PlaceOrderButton({ cartItems, getTotalPrice, clearCart, disabled }) {
+  const [placeOrder] = useMutation(PLACE_ORDER);
+
+  const handlePlaceOrder = async () => {
+    if (disabled || cartItems.length === 0) return;
+
+    try {
+      console.log('Cart items before processing:', cartItems);
+      
+      const orderItems = cartItems.map(item => {
+        const formattedAttributes = Object.entries(item.selectedAttributes || {}).map(([name, value]) => ({
+          name: name,
+          value: value,
+          displayValue: value // Using value as displayValue since we have the selected value
+        }));
+
+        return {
+          productId: item.id,
+          quantity: item.quantity,
+          attributeValues: formattedAttributes
+        };
+      });
+
+      console.log('Processed order items:', orderItems);
+
+      const { data } = await placeOrder({
+        variables: {
+          items: orderItems,
+          totalAmount: getTotalPrice(),
+          currencyCode: 'USD'
+        }
+      });
+
+      console.log('Order placed successfully:', data);
+      clearCart();
+      alert('Order placed successfully!');
+      
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert(`Failed to place order: ${error.message}`);
+    }
+  };
+
+  return (
+    <button 
+      className="checkout-btn" 
+      onClick={handlePlaceOrder}
+      disabled={disabled}
+    >
+      PLACE ORDER
+    </button>
+  );
 }
 
 export default CartOverlay;

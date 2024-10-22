@@ -11,9 +11,9 @@ class CartItemInputType extends InputObjectType
         parent::__construct([
             'name' => 'CartItemInput',
             'fields' => [
-                'productId' => TypeRegistry::nonNull(TypeRegistry::id()),
+                'productId' => TypeRegistry::nonNull(TypeRegistry::string()),
                 'quantity' => TypeRegistry::nonNull(TypeRegistry::int()),
-                'attributeValues' => TypeRegistry::listOf(TypeRegistry::attributeInput()),
+                'attributeValues' => TypeRegistry::listOf(TypeRegistry::attributeInput())
             ],
         ]);
     }

@@ -97,15 +97,62 @@ class Resolvers
         return $success ? CartItem::find($args['cartItemId']) : null;
     }
 
-    public function placeOrder($args)
+    public function placeOrder($rootValue, $args)
     {
-        $order = new Order();
-        $orderId = $order->save([
-            'total_amount' => 0, // Calculate this based on cart items
-            'currency_code' => 'USD', // Get this from somewhere
-            'status' => 'PENDING',
-            'items' => $args['cartItems']
-        ]);
-        return Order::find($orderId);
+        try {
+            error_log('Placing order with args: ' . json_encode($args));
+
+            $order = new Order();
+            $orderItems = [];
+
+            foreach ($args['items'] as $item) {
+                $product = Product::find($item['productId']);
+                if (!$product) {
+                    throw new \Exception('Product not found: ' . $item['productId']);
+                }
+
+                $itemTotal = $product['prices'][0]['amount'] * $item['quantity'];
+
+                // Format attribute values for storage
+                $attributes = [];
+                if (!empty($item['attributeValues'])) {
+                    foreach ($item['attributeValues'] as $attr) {
+                        $attributes[$attr['name']] = $attr['value'];
+                    }
+                }
+
+                $orderItems[] = [
+                    'product_id' => $item['productId'],
+                    'product_name' => $product['name'],
+                    'quantity' => $item['quantity'],
+                    'paid_amount' => $itemTotal,
+                    'currency_code' => 'USD',
+                    'attribute_values' => json_encode($attributes)
+                ];
+            }
+
+            $totalAmount = array_sum(array_column($orderItems, 'paid_amount'));
+
+            $orderData = [
+                'total_amount' => $totalAmount,
+                'currency_code' => 'USD',
+                'status' => 'pending'
+            ];
+
+            error_log('Creating order with data: ' . json_encode($orderData));
+            $orderId = $order->save($orderData, $orderItems);
+
+            return [
+                'order_id' => $orderId,
+                'total_amount' => $totalAmount,
+                'currency_code' => 'USD',
+                'status' => 'pending',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+        } catch (\Exception $e) {
+            error_log('Error placing order: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
+use App\Model\Order;
 
 class OrderType extends ObjectType
 {
@@ -11,10 +12,24 @@ class OrderType extends ObjectType
         parent::__construct([
             'name' => 'Order',
             'fields' => [
-                'id' => TypeRegistry::nonNull(TypeRegistry::id()),
-                'items' => TypeRegistry::listOf(TypeRegistry::orderItem()),
-                'total' => TypeRegistry::nonNull(TypeRegistry::price()),
-                'status' => TypeRegistry::nonNull(TypeRegistry::orderStatus()),
+                'order_id' => [
+                    'type' => TypeRegistry::nonNull(TypeRegistry::int()),
+                ],
+                'total_amount' => [
+                    'type' => TypeRegistry::nonNull(TypeRegistry::float()),
+                ],
+                'currency_code' => [
+                    'type' => TypeRegistry::nonNull(TypeRegistry::string()),
+                ],
+                'status' => [
+                    'type' => TypeRegistry::nonNull(TypeRegistry::string()),
+                ],
+                'created_at' => [
+                    'type' => TypeRegistry::nonNull(TypeRegistry::string()),
+                ],
+                'updated_at' => [
+                    'type' => TypeRegistry::nonNull(TypeRegistry::string()),
+                ]
             ],
         ]);
     }

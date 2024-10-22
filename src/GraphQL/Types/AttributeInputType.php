@@ -11,8 +11,9 @@ class AttributeInputType extends InputObjectType
         parent::__construct([
             'name' => 'AttributeInput',
             'fields' => [
-                'id' => TypeRegistry::nonNull(TypeRegistry::id()),
+                'name' => TypeRegistry::nonNull(TypeRegistry::string()),
                 'value' => TypeRegistry::nonNull(TypeRegistry::string()),
+                'displayValue' => TypeRegistry::string()
             ],
         ]);
     }

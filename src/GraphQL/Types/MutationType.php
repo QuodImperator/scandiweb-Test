@@ -12,33 +12,18 @@ class MutationType extends ObjectType
         parent::__construct([
             'name' => 'Mutation',
             'fields' => [
-                'addToCart' => [
-                    'type' => TypeRegistry::cartItem(),
-                    'args' => [
-                        'productId' => TypeRegistry::nonNull(TypeRegistry::id()),
-                        'attributeValues' => TypeRegistry::listOf(TypeRegistry::attributeInput()),
-                    ],
-                    'resolve' => [$resolvers, 'addToCart'],
-                ],
-                'removeFromCart' => [
-                    'type' => TypeRegistry::boolean(),
-                    'args' => ['cartItemId' => TypeRegistry::nonNull(TypeRegistry::id())],
-                    'resolve' => [$resolvers, 'removeFromCart'],
-                ],
-                'updateCartItemQuantity' => [
-                    'type' => TypeRegistry::cartItem(),
-                    'args' => [
-                        'cartItemId' => TypeRegistry::nonNull(TypeRegistry::id()),
-                        'quantity' => TypeRegistry::nonNull(TypeRegistry::int()),
-                    ],
-                    'resolve' => [$resolvers, 'updateCartItemQuantity'],
-                ],
                 'placeOrder' => [
                     'type' => TypeRegistry::order(),
-                    'args' => ['cartItems' => TypeRegistry::listOf(TypeRegistry::cartItemInput())],
-                    'resolve' => [$resolvers, 'placeOrder'],
-                ],
-            ],
+                    'args' => [
+                        'items' => TypeRegistry::nonNull(TypeRegistry::listOf(
+                            TypeRegistry::cartItemInput()
+                        )),
+                        'totalAmount' => TypeRegistry::nonNull(TypeRegistry::float()),
+                        'currencyCode' => TypeRegistry::nonNull(TypeRegistry::string())
+                    ],
+                    'resolve' => [$resolvers, 'placeOrder']
+                ]
+            ]
         ]);
     }
 }
