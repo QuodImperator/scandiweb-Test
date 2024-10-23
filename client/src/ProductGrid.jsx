@@ -91,7 +91,7 @@ class ProductGrid extends React.Component {
             case 'all':
                 return 'All';
             case '2':
-                return 'Women';
+                return 'Clothes';
             case '3':
                 return 'Tech';
             default:
