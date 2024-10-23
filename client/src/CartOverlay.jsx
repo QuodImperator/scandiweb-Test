@@ -72,7 +72,7 @@ class CartOverlay extends React.Component {
               </div>
 
               <div className="cart-buttons">
-                <PlaceOrderButton
+                <PlaceOrderButtonWithMutation
                   cartItems={cartItems}
                   getTotalPrice={getTotalPrice}
                   clearCart={clearCart}
@@ -87,33 +87,47 @@ class CartOverlay extends React.Component {
   }
 }
 
-
-function PlaceOrderButton({ cartItems, getTotalPrice, clearCart, disabled }) {
+const PlaceOrderButtonWithMutation = ({ cartItems, getTotalPrice, clearCart, disabled }) => {
   const [placeOrder] = useMutation(PLACE_ORDER);
 
-  const handlePlaceOrder = async () => {
+  return (
+    <PlaceOrderButton
+      cartItems={cartItems}
+      getTotalPrice={getTotalPrice}
+      clearCart={clearCart}
+      disabled={disabled}
+      placeOrder={placeOrder}
+    />
+  );
+};
+
+class PlaceOrderButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isPlacingOrder: false
+    };
+  }
+
+  handlePlaceOrder = async () => {
+    const { cartItems, getTotalPrice, clearCart, disabled, placeOrder } = this.props;
+
     if (disabled || cartItems.length === 0) return;
 
+    this.setState({ isPlacingOrder: true });
+
     try {
-      console.log('Cart items before processing:', cartItems);
-      
-      const orderItems = cartItems.map(item => {
-        const formattedAttributes = Object.entries(item.selectedAttributes || {}).map(([name, value]) => ({
-          name: name,
-          value: value,
-          displayValue: value // Using value as displayValue since we have the selected value
-        }));
+      const orderItems = cartItems.map(item => ({
+        productId: item.id,
+        quantity: item.quantity,
+        attributeValues: Object.entries(item.selectedAttributes || {}).map(([name, value]) => ({
+          name,
+          value,
+          displayValue: value
+        }))
+      }));
 
-        return {
-          productId: item.id,
-          quantity: item.quantity,
-          attributeValues: formattedAttributes
-        };
-      });
-
-      console.log('Processed order items:', orderItems);
-
-      const { data } = await placeOrder({
+      await placeOrder({
         variables: {
           items: orderItems,
           totalAmount: getTotalPrice(),
@@ -121,25 +135,32 @@ function PlaceOrderButton({ cartItems, getTotalPrice, clearCart, disabled }) {
         }
       });
 
-      console.log('Order placed successfully:', data);
       clearCart();
       alert('Order placed successfully!');
-      
+
     } catch (error) {
       console.error('Error placing order:', error);
       alert(`Failed to place order: ${error.message}`);
+    } finally {
+      this.setState({ isPlacingOrder: false });
     }
   };
 
-  return (
-    <button 
-      className="checkout-btn" 
-      onClick={handlePlaceOrder}
-      disabled={disabled}
-    >
-      PLACE ORDER
-    </button>
-  );
+  render() {
+    const { disabled } = this.props;
+    const { isPlacingOrder } = this.state;
+
+    return (
+      <button
+        className="checkout-btn"
+        onClick={this.handlePlaceOrder}
+        disabled={disabled || isPlacingOrder}
+        data-testid="place-order-button"
+      >
+        {isPlacingOrder ? 'PLACING ORDER...' : 'PLACE ORDER'}
+      </button>
+    );
+  }
 }
 
 export default CartOverlay;
