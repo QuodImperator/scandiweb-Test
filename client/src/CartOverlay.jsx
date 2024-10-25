@@ -1,20 +1,12 @@
 import React from 'react';
 import { CartConsumer } from './CartContext';
 import { useMutation } from '@apollo/client';
-import { gql } from '@apollo/client';
+import { PLACE_ORDER } from './queries';
 
-const PLACE_ORDER = gql`
-  mutation PlaceOrder($items: [CartItemInput!]!, $totalAmount: Float!, $currencyCode: String!) {
-    placeOrder(items: $items, totalAmount: $totalAmount, currencyCode: $currencyCode) {
-      order_id
-      total_amount
-      currency_code
-      status
-      created_at
-      updated_at
-    }
-  }
-`;
+const MutationWrapper = ({ children }) => {
+  const [placeOrder] = useMutation(PLACE_ORDER);
+  return children(placeOrder);
+};
 
 class CartOverlay extends React.Component {
   render() {
@@ -87,19 +79,25 @@ class CartOverlay extends React.Component {
   }
 }
 
-const PlaceOrderButtonWithMutation = ({ cartItems, getTotalPrice, clearCart, disabled }) => {
-  const [placeOrder] = useMutation(PLACE_ORDER);
-
-  return (
-    <PlaceOrderButton
-      cartItems={cartItems}
-      getTotalPrice={getTotalPrice}
-      clearCart={clearCart}
-      disabled={disabled}
-      placeOrder={placeOrder}
-    />
-  );
-};
+class PlaceOrderButtonWithMutation extends React.Component {
+  render() {
+    const { cartItems, getTotalPrice, clearCart, disabled } = this.props;
+    
+    return (
+      <MutationWrapper>
+        {(placeOrder) => (
+          <PlaceOrderButton
+            cartItems={cartItems}
+            getTotalPrice={getTotalPrice}
+            clearCart={clearCart}
+            disabled={disabled}
+            placeOrder={placeOrder}
+          />
+        )}
+      </MutationWrapper>
+    );
+  }
+}
 
 class PlaceOrderButton extends React.Component {
   constructor(props) {
@@ -137,7 +135,6 @@ class PlaceOrderButton extends React.Component {
 
       clearCart();
       alert('Order placed successfully!');
-
     } catch (error) {
       console.error('Error placing order:', error);
       alert(`Failed to place order: ${error.message}`);

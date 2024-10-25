@@ -1,37 +1,9 @@
 import React from 'react';
 import { Query } from '@apollo/client/react/components';
-import { gql } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import { CartConsumer } from './CartContext';
 import buy_icon from './assets/circle_icon.png';
-
-const GET_PRODUCTS = gql`
-  query GetProducts($categoryId: String) {
-    products(categoryId: $categoryId) {
-      id
-      name
-      inStock
-      gallery
-      prices {
-        amount
-        currency {
-          symbol
-        }
-      }
-      brand
-      attributes {
-        id
-        name
-        type
-        items {
-          id
-          displayValue
-          value
-        }
-      }
-    }
-  }
-`;
+import { GET_PRODUCTS } from './queries';
 
 class ProductCard extends React.Component {
     handleQuickAddToCart = (e, product, addToCart) => {

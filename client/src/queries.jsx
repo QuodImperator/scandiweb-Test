@@ -61,16 +61,14 @@ export const UPDATE_CART_ITEM_QUANTITY = gql`
 `;
 
 export const PLACE_ORDER = gql`
-  mutation PlaceOrder {
-    placeOrder {
-      id
-      total {
-        amount
-        currency {
-          label
-          symbol
-        }
-      }
+  mutation PlaceOrder($items: [CartItemInput!]!, $totalAmount: Float!, $currencyCode: String!) {
+    placeOrder(items: $items, totalAmount: $totalAmount, currencyCode: $currencyCode) {
+      order_id
+      total_amount
+      currency_code
+      status
+      created_at
+      updated_at
     }
   }
 `;
@@ -103,6 +101,43 @@ export const GET_PRODUCT = gql`
           value
         }
       }
+    }
+  }
+`;
+
+export const GET_PRODUCTS = gql`
+  query GetProducts($categoryId: String) {
+    products(categoryId: $categoryId) {
+      id
+      name
+      inStock
+      gallery
+      prices {
+        amount
+        currency {
+          symbol
+        }
+      }
+      brand
+      attributes {
+        id
+        name
+        type
+        items {
+          id
+          displayValue
+          value
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CATEGORIES = gql`
+  query GetCategories {
+    categories {
+      category_id
+      name
     }
   }
 `;

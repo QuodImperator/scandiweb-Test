@@ -25,7 +25,6 @@ class BodyClassHandler extends React.Component {
   }
 }
 
-// Wrapper functional component to use useLocation
 function BodyClassHandlerWrapper() {
   const location = useLocation();
   return <BodyClassHandler location={location} />;
