@@ -2,8 +2,9 @@ import React from 'react';
 import { Query } from '@apollo/client/react/components';
 import { Link } from 'react-router-dom';
 import { CartConsumer } from './CartContext';
-import buy_icon from './assets/circle_icon.png';
 import { GET_PRODUCTS } from './queries';
+import buy_icon from './assets/circle_icon.png';
+import { useParams } from 'react-router-dom';  
 
 class ProductCard extends React.Component {
     handleQuickAddToCart = (e, product, addToCart) => {
@@ -23,6 +24,7 @@ class ProductCard extends React.Component {
     render() {
         const { product } = this.props;
         const price = product.prices && product.prices.length > 0 ? product.prices[0] : null;
+        const kebabName = product.name.toLowerCase().replace(/\s+/g, '-');
 
         return (
             <CartConsumer>
@@ -30,7 +32,8 @@ class ProductCard extends React.Component {
                     <Link
                         to={`/product/${product.id}`}
                         className="product-card-link"
-                        data-testid={`product-${product.name.toLowerCase().replace(/\s+/g, '-')}`}
+                        data-testid={`product-${kebabName}`}
+                        href={`/product/${product.id}`}
                     >
                         <div className="product-card">
                             <img src={product.gallery[0]} alt={product.name} className="product-image" />
@@ -75,16 +78,21 @@ class ProductGrid extends React.Component {
         }
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.categoryId !== this.props.categoryId) {
+            this.forceUpdate();
+        }
+    }
+
     render() {
         const { categoryId } = this.props;
+        const categoryName = this.getCategoryName(categoryId);
 
         return (
             <Query query={GET_PRODUCTS} variables={{ categoryId }}>
                 {({ loading, error, data }) => {
                     if (loading) return <p></p>;
                     if (error) return <p>Error: {error.message}</p>;
-
-                    const categoryName = this.getCategoryName(categoryId);
 
                     return (
                         <>
@@ -106,4 +114,9 @@ class ProductGrid extends React.Component {
     }
 }
 
-export default ProductGrid;
+function ProductGridWithParams(props) {
+    const params = useParams();
+    return <ProductGrid {...props} urlCategory={params.category} />;
+}
+
+export default ProductGridWithParams;

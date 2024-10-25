@@ -175,6 +175,14 @@ class ProductDetailsContent extends React.Component {
 }
 
 class ProductDetails extends React.Component {
+  componentDidMount() {
+    document.body.classList.add('product-details-active');
+  }
+
+  componentWillUnmount() {
+    document.body.classList.remove('product-details-active');
+  }
+
   render() {
     const { id } = this.props.router.params;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import CartOverlay from './CartOverlay';
 import CartContext from './CartContext';
 import cart_icon from './assets/EmptyCart.png';
@@ -8,12 +8,17 @@ class Header extends React.Component {
   static contextType = CartContext;
 
   state = {
-    activeTab: 'All',
     isCartOpen: false
   };
 
-  handleClick = (tab, categoryId) => {
-    this.setState({ activeTab: tab });
+  getActiveTab = () => {
+    const path = this.props.location.pathname;
+    if (path.includes('tech')) return 'Tech';
+    if (path.includes('clothes')) return 'Clothes';
+    return 'All';
+  };
+
+  handleCategoryClick = (categoryId) => {
     this.props.onCategoryChange(categoryId);
   };
 
@@ -23,8 +28,9 @@ class Header extends React.Component {
   };
 
   render() {
-    const { activeTab, isCartOpen } = this.state;
+    const { isCartOpen } = this.state;
     const { cartItems } = this.context;
+    const activeTab = this.getActiveTab();
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     return (
@@ -34,9 +40,9 @@ class Header extends React.Component {
             <ul>
               <li>
                 <Link
-                  to="/"
+                  to="/all"
                   className={`nav-link ${activeTab === 'All' ? 'active' : ''}`}
-                  onClick={() => this.handleClick('All', 'all')}
+                  onClick={() => this.handleCategoryClick('all')}
                   data-testid={activeTab === 'All' ? 'active-category-link' : 'category-link'}
                 >
                   ALL
@@ -44,9 +50,9 @@ class Header extends React.Component {
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/clothes"
                   className={`nav-link ${activeTab === 'Clothes' ? 'active' : ''}`}
-                  onClick={() => this.handleClick('Clothes', '2')}
+                  onClick={() => this.handleCategoryClick('2')}
                   data-testid={activeTab === 'Clothes' ? 'active-category-link' : 'category-link'}
                 >
                   CLOTHES
@@ -54,9 +60,9 @@ class Header extends React.Component {
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/tech"
                   className={`nav-link ${activeTab === 'Tech' ? 'active' : ''}`}
-                  onClick={() => this.handleClick('Tech', '3')}
+                  onClick={() => this.handleCategoryClick('3')}
                   data-testid={activeTab === 'Tech' ? 'active-category-link' : 'category-link'}
                 >
                   TECH
@@ -65,17 +71,30 @@ class Header extends React.Component {
             </ul>
           </nav>
           <div className="cart-wrapper">
-            <div className="cart-icon" onClick={this.toggleCart} data-testid="cart-btn">
-              <img src={cart_icon} alt="Cart" />
+            <button 
+              onClick={this.toggleCart}
+              data-testid="cart-btn"
+              className="cart-icon-button"
+            >
+              <img src={cart_icon} alt="Cart" className="cart-icon" />
               {itemCount > 0 && <span className="cart-count">{itemCount}</span>}
-            </div>
+            </button>
           </div>
         </header>
-        <CartOverlay isOpen={isCartOpen} onClose={this.toggleCart} />
-        {isCartOpen && <div className="cart-overlay-wrapper" onClick={this.toggleCart}></div>}
+        {isCartOpen && (
+          <>
+            <CartOverlay isOpen={isCartOpen} onClose={this.toggleCart} />
+            <div className="cart-overlay-wrapper" onClick={this.toggleCart}></div>
+          </>
+        )}
       </>
     );
   }
 }
 
-export default Header;
+function HeaderWithRouter(props) {
+  const location = useLocation();
+  return <Header {...props} location={location} />;
+}
+
+export default HeaderWithRouter;

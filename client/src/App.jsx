@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Header from './Header';
 import ProductGrid from './ProductGrid';
 import ProductDetails from './ProductDetails';
@@ -22,14 +22,11 @@ class App extends React.Component {
             <Header onCategoryChange={this.handleCategoryChange} />
             <div className="main-content">
               <Routes>
-                <Route 
-                  path="/" 
-                  element={<ProductGrid categoryId={this.state.selectedCategory} />} 
-                />
-                <Route 
-                  path="/product/:id" 
-                  element={<ProductDetails />} 
-                />
+                <Route path="/" element={<Navigate to="/all" replace />} />
+                <Route path="/all" element={<ProductGrid categoryId="all" />} />
+                <Route path="/clothes" element={<ProductGrid categoryId="2" />} />
+                <Route path="/tech" element={<ProductGrid categoryId="3" />} />
+                <Route path="/product/:id" element={<ProductDetails />} />
               </Routes>
             </div>
           </div>
