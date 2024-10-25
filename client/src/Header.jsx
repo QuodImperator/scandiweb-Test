@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CartOverlay from './CartOverlay';
 import CartContext from './CartContext';
 import cart_icon from './assets/EmptyCart.png';
@@ -18,8 +18,10 @@ class Header extends React.Component {
     return 'All';
   };
 
-  handleCategoryClick = (categoryId) => {
+  handleClick = (e, categoryId, path) => {
+    e.preventDefault();
     this.props.onCategoryChange(categoryId);
+    this.props.navigate(path);
   };
 
   toggleCart = (e) => {
@@ -39,34 +41,34 @@ class Header extends React.Component {
           <nav>
             <ul>
               <li>
-                <Link
-                  to="/all"
+                <a
+                  href="/all"
                   className={`nav-link ${activeTab === 'All' ? 'active' : ''}`}
-                  onClick={() => this.handleCategoryClick('all')}
+                  onClick={(e) => this.handleClick(e, 'all', '/all')}
                   data-testid={activeTab === 'All' ? 'active-category-link' : 'category-link'}
                 >
                   ALL
-                </Link>
+                </a>
               </li>
               <li>
-                <Link
-                  to="/clothes"
+                <a
+                  href="/clothes"
                   className={`nav-link ${activeTab === 'Clothes' ? 'active' : ''}`}
-                  onClick={() => this.handleCategoryClick('2')}
+                  onClick={(e) => this.handleClick(e, '2', '/clothes')}
                   data-testid={activeTab === 'Clothes' ? 'active-category-link' : 'category-link'}
                 >
                   CLOTHES
-                </Link>
+                </a>
               </li>
               <li>
-                <Link
-                  to="/tech"
+                <a
+                  href="/tech"
                   className={`nav-link ${activeTab === 'Tech' ? 'active' : ''}`}
-                  onClick={() => this.handleCategoryClick('3')}
+                  onClick={(e) => this.handleClick(e, '3', '/tech')}
                   data-testid={activeTab === 'Tech' ? 'active-category-link' : 'category-link'}
                 >
                   TECH
-                </Link>
+                </a>
               </li>
             </ul>
           </nav>
@@ -94,7 +96,8 @@ class Header extends React.Component {
 
 function HeaderWithRouter(props) {
   const location = useLocation();
-  return <Header {...props} location={location} />;
+  const navigate = useNavigate();
+  return <Header {...props} location={location} navigate={navigate} />;
 }
 
 export default HeaderWithRouter;
