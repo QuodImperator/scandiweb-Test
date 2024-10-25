@@ -42,7 +42,7 @@ class Header extends React.Component {
             <ul>
               <li>
                 <a
-                  href="/all"
+                  href={"/all"}
                   className={`nav-link ${activeTab === 'All' ? 'active' : ''}`}
                   onClick={(e) => this.handleClick(e, 'all', '/all')}
                   data-testid={activeTab === 'All' ? 'active-category-link' : 'category-link'}
@@ -52,7 +52,7 @@ class Header extends React.Component {
               </li>
               <li>
                 <a
-                  href="/clothes"
+                  href={"/clothes"}
                   className={`nav-link ${activeTab === 'Clothes' ? 'active' : ''}`}
                   onClick={(e) => this.handleClick(e, '2', '/clothes')}
                   data-testid={activeTab === 'Clothes' ? 'active-category-link' : 'category-link'}
@@ -62,7 +62,7 @@ class Header extends React.Component {
               </li>
               <li>
                 <a
-                  href="/tech"
+                  href={"/tech"}
                   className={`nav-link ${activeTab === 'Tech' ? 'active' : ''}`}
                   onClick={(e) => this.handleClick(e, '3', '/tech')}
                   data-testid={activeTab === 'Tech' ? 'active-category-link' : 'category-link'}
@@ -73,7 +73,7 @@ class Header extends React.Component {
             </ul>
           </nav>
           <div className="cart-wrapper">
-            <button 
+            <button
               onClick={this.toggleCart}
               data-testid="cart-btn"
               className="cart-icon-button"
