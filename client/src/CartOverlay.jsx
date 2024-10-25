@@ -26,7 +26,11 @@ class CartOverlay extends React.Component {
                     <h3>{item.name}</h3>
                     <p className="item-price">{item.prices[0].currency.symbol}{item.prices[0].amount.toFixed(2)}</p>
                     {item.attributes && item.attributes.map(attr => (
-                      <div key={attr.name} className="item-attribute">
+                      <div
+                        key={attr.name}
+                        className="item-attribute"
+                        data-testid={`cart-item-attribute-${attr.name.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
                         <p>{attr.name}:</p>
                         <div className="attribute-options">
                           {attr.items.map(option => (
@@ -34,7 +38,8 @@ class CartOverlay extends React.Component {
                               key={option.id}
                               className={`attribute-option ${item.selectedAttributes[attr.name] === option.value ? 'selected' : ''}`}
                               style={attr.type === 'swatch' ? { backgroundColor: option.value } : {}}
-                              onClick={() => updateItemAttributes(item, attr.name, option.value)}
+                              data-testid={`cart-item-attribute-${attr.name.toLowerCase().replace(/\s+/g, '-')}-${option.value.toLowerCase().replace(/\s+/g, '-')}${item.selectedAttributes[attr.name] === option.value ? '-selected' : ''
+                                }`}
                             >
                               {attr.type !== 'swatch' && option.value}
                             </button>
@@ -44,21 +49,27 @@ class CartOverlay extends React.Component {
                     ))}
                   </div>
                   <div className="item-actions">
-                    <button onClick={() => updateItemQuantity(item, item.quantity + 1)}>+</button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => {
-                      if (item.quantity === 1) {
-                        removeFromCart(item);
-                      } else {
-                        updateItemQuantity(item, item.quantity - 1);
-                      }
-                    }}>-</button>
+                    <button
+                      onClick={() => updateItemQuantity(item, item.quantity + 1)}
+                      data-testid="cart-item-amount-increase"
+                    >+</button>
+                    <span data-testid="cart-item-amount">{item.quantity}</span>
+                    <button
+                      onClick={() => {
+                        if (item.quantity === 1) {
+                          removeFromCart(item);
+                        } else {
+                          updateItemQuantity(item, item.quantity - 1);
+                        }
+                      }}
+                      data-testid="cart-item-amount-decrease"
+                    >-</button>
                   </div>
                   <img src={item.gallery[0]} alt={item.name} className="item-image" />
                 </div>
               ))}
 
-              <div className="cart-total">
+              <div className="cart-total" data-testid="cart-total">
                 <h3>Total</h3>
                 <p>${getTotalPrice().toFixed(2)}</p>
               </div>
@@ -82,7 +93,7 @@ class CartOverlay extends React.Component {
 class PlaceOrderButtonWithMutation extends React.Component {
   render() {
     const { cartItems, getTotalPrice, clearCart, disabled } = this.props;
-    
+
     return (
       <MutationWrapper>
         {(placeOrder) => (

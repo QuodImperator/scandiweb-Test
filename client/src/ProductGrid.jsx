@@ -27,7 +27,11 @@ class ProductCard extends React.Component {
         return (
             <CartConsumer>
                 {({ addToCart }) => (
-                    <Link to={`/product/${product.id}`} className="product-card-link">
+                    <Link
+                        to={`/product/${product.id}`}
+                        className="product-card-link"
+                        data-testid={`product-${product.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
                         <div className="product-card">
                             <img src={product.gallery[0]} alt={product.name} className="product-image" />
                             {!product.inStock && (
@@ -42,7 +46,7 @@ class ProductCard extends React.Component {
                                 <p className="product-price">Price not available</p>
                             )}
                             {product.inStock && (
-                                <button 
+                                <button
                                     className="add-to-cart"
                                     onClick={(e) => this.handleQuickAddToCart(e, product, addToCart)}
                                 >
@@ -59,7 +63,7 @@ class ProductCard extends React.Component {
 
 class ProductGrid extends React.Component {
     getCategoryName(categoryId) {
-        switch(categoryId) {
+        switch (categoryId) {
             case 'all':
                 return 'All';
             case '2':

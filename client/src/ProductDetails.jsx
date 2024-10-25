@@ -3,6 +3,7 @@ import { Query } from '@apollo/client/react/components';
 import { GET_PRODUCT } from './queries';
 import { CartConsumer } from './CartContext';
 import { WithRouter } from './WithRouter';
+import HTMLParser from './HTMLParser';
 
 class ProductDetailsContent extends React.Component {
   constructor(props) {
@@ -101,7 +102,7 @@ class ProductDetailsContent extends React.Component {
 
     return (
       <div className="product-details">
-        <div className="product-gallery">
+        <div className="product-gallery" data-testid="product-gallery">
           <div className="thumbnails">
             {product.gallery.map((image, index) => (
               <img
@@ -124,7 +125,11 @@ class ProductDetailsContent extends React.Component {
           <h2 className="product-brand">{product.brand}</h2>
 
           {product.attributes.map(attribute => (
-            <div key={attribute.id} className="product-attribute">
+            <div
+              key={attribute.id}
+              className="product-attribute"
+              data-testid={`product-attribute-${attribute.name.toLowerCase().replace(/\s+/g, '-')}`}
+            >
               <h3>{attribute.name}:</h3>
               <div className="attribute-options">
                 {attribute.items.map(item => (
@@ -152,14 +157,17 @@ class ProductDetailsContent extends React.Component {
             className="add-to-cart"
             disabled={isAddToCartDisabled}
             onClick={this.handleAddToCart}
+            data-testid="add-to-cart"
           >
             {product.inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
 
           <div
             className="product-description"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
+            data-testid="product-description"
+          >
+            <HTMLParser html={product.description} />
+          </div>
         </div>
       </div>
     );

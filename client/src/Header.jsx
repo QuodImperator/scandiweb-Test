@@ -37,6 +37,7 @@ class Header extends React.Component {
                   to="/"
                   className={`nav-link ${activeTab === 'All' ? 'active' : ''}`}
                   onClick={() => this.handleClick('All', 'all')}
+                  data-testid={activeTab === 'All' ? 'active-category-link' : 'category-link'}
                 >
                   ALL
                 </Link>
@@ -46,6 +47,7 @@ class Header extends React.Component {
                   to="/"
                   className={`nav-link ${activeTab === 'Clothes' ? 'active' : ''}`}
                   onClick={() => this.handleClick('Clothes', '2')}
+                  data-testid={activeTab === 'Clothes' ? 'active-category-link' : 'category-link'}
                 >
                   CLOTHES
                 </Link>
@@ -55,6 +57,7 @@ class Header extends React.Component {
                   to="/"
                   className={`nav-link ${activeTab === 'Tech' ? 'active' : ''}`}
                   onClick={() => this.handleClick('Tech', '3')}
+                  data-testid={activeTab === 'Tech' ? 'active-category-link' : 'category-link'}
                 >
                   TECH
                 </Link>
