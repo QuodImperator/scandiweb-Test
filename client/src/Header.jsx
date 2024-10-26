@@ -1,39 +1,27 @@
 import React from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CartOverlay from './CartOverlay';
 import CartContext from './CartContext';
-import { GET_CATEGORIES } from './queries';
 import cart_icon from './assets/EmptyCart.png';
 
 class Header extends React.Component {
   static contextType = CartContext;
 
   state = {
-    isCartOpen: false,
-    categories: []
+    isCartOpen: false
   };
-
-  componentDidMount() {
-    // Fetch categories from GraphQL
-    this.props.client.query({
-      query: GET_CATEGORIES
-    })
-    .then(result => {
-      this.setState({ categories: result.data.categories });
-    })
-    .catch(error => console.error("Error fetching categories:", error));
-  }
 
   getActiveTab = () => {
-    const path = this.props.location.pathname.slice(1); // Remove leading slash
-    return path || 'all';
+    const path = this.props.location.pathname;
+    if (path.includes('tech')) return 'Tech';
+    if (path.includes('clothes')) return 'Clothes';
+    return 'All';
   };
 
-  handleClick = (e, categoryName) => {
+  handleClick = (e, categoryId, path) => {
     e.preventDefault();
-    this.props.onCategoryChange(categoryName);
-    this.props.navigate(`/${categoryName}`);
+    this.props.onCategoryChange(categoryId);
+    this.props.navigate(path);
   };
 
   toggleCart = (e) => {
@@ -42,10 +30,16 @@ class Header extends React.Component {
   };
 
   render() {
-    const { isCartOpen, categories } = this.state;
+    const { isCartOpen } = this.state;
     const { cartItems } = this.context;
     const activeTab = this.getActiveTab();
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+    const categories = [
+      { id: 'all', path: '/all', name: 'ALL' },
+      { id: 'clothes', path: '/clothes', name: 'CLOTHES' },
+      { id: 'tech', path: '/tech', name: 'TECH' }
+    ];
 
     return (
       <>
@@ -53,15 +47,14 @@ class Header extends React.Component {
           <nav>
             <ul>
               {categories.map(category => (
-                <li key={category.name}>
-                  <Link
-                    to={`/${category.name}`}
-                    className={`nav-link ${activeTab === category.name ? 'active' : ''}`}
-                    onClick={(e) => this.handleClick(e, category.name)}
-                    data-testid={activeTab === category.name ? 'active-category-link' : 'category-link'}
+                <li key={category.id}>
+                  <a
+                    href={category.path}
+                    className={`nav-link ${activeTab === category.name.charAt(0) + category.name.slice(1).toLowerCase() ? 'active' : ''}`}
+                    onClick={(e) => this.handleClick(e, category.id, category.path)}
                   >
-                    {category.name.toUpperCase()}
-                  </Link>
+                    {category.name}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -88,15 +81,10 @@ class Header extends React.Component {
   }
 }
 
-function HeaderWithRouterAndApollo(props) {
+function HeaderWithRouter(props) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { loading, error, data, client } = useQuery(GET_CATEGORIES);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading categories</div>;
-
-  return <Header {...props} location={location} navigate={navigate} client={client} />;
+  return <Header {...props} location={location} navigate={navigate} />;
 }
 
-export default HeaderWithRouterAndApollo;
+export default HeaderWithRouter;
