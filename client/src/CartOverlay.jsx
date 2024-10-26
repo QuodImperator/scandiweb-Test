@@ -9,6 +9,10 @@ const MutationWrapper = ({ children }) => {
 };
 
 class CartOverlay extends React.Component {
+  handleAttributeChange = (item, attr, option, updateItemAttributes) => {
+    updateItemAttributes(item, attr.name, option.value);
+  };
+
   render() {
     const { isOpen, onClose } = this.props;
 
@@ -20,11 +24,13 @@ class CartOverlay extends React.Component {
           <div className="cart-overlay active">
             <div className="cart-content">
               <h2>My Bag, {cartItems.length === 1 ? '1 item' : `${cartItems.length} items`}</h2>
-              {cartItems.map((item, index) => (
-                <div key={index} className="cart-item">
+              {cartItems.map((item) => (
+                <div key={item.cartId} className="cart-item">
                   <div className="item-details">
                     <h3>{item.name}</h3>
                     <p className="item-price">{item.prices[0].currency.symbol}{item.prices[0].amount.toFixed(2)}</p>
+                    
+                    {/* Attributes Section */}
                     {item.attributes && item.attributes.map(attr => (
                       <div
                         key={attr.name}
@@ -36,10 +42,23 @@ class CartOverlay extends React.Component {
                           {attr.items.map(option => (
                             <button
                               key={option.id}
-                              className={`attribute-option ${item.selectedAttributes[attr.name] === option.value ? 'selected' : ''}`}
+                              className={`attribute-option ${
+                                item.selectedAttributes[attr.name] === option.value ? 'selected' : ''
+                              }`}
                               style={attr.type === 'swatch' ? { backgroundColor: option.value } : {}}
-                              data-testid={`cart-item-attribute-${attr.name.toLowerCase().replace(/\s+/g, '-')}-${option.value.toLowerCase().replace(/\s+/g, '-')}${item.selectedAttributes[attr.name] === option.value ? '-selected' : ''
-                                }`}
+                              onClick={() => this.handleAttributeChange(
+                                item, 
+                                attr, 
+                                option,
+                                updateItemAttributes
+                              )}
+                              data-testid={`cart-item-attribute-${
+                                attr.name.toLowerCase().replace(/\s+/g, '-')
+                              }-${
+                                option.value.toLowerCase().replace(/\s+/g, '-')
+                              }${
+                                item.selectedAttributes[attr.name] === option.value ? '-selected' : ''
+                              }`}
                             >
                               {attr.type !== 'swatch' && option.value}
                             </button>
@@ -48,11 +67,15 @@ class CartOverlay extends React.Component {
                       </div>
                     ))}
                   </div>
+                  
+                  {/* Quantity Controls */}
                   <div className="item-actions">
                     <button
                       onClick={() => updateItemQuantity(item, item.quantity + 1)}
                       data-testid="cart-item-amount-increase"
-                    >+</button>
+                    >
+                      +
+                    </button>
                     <span data-testid="cart-item-amount">{item.quantity}</span>
                     <button
                       onClick={() => {
@@ -63,17 +86,23 @@ class CartOverlay extends React.Component {
                         }
                       }}
                       data-testid="cart-item-amount-decrease"
-                    >-</button>
+                    >
+                      -
+                    </button>
                   </div>
+                  
+                  {/* Product Image */}
                   <img src={item.gallery[0]} alt={item.name} className="item-image" />
                 </div>
               ))}
 
+              {/* Cart Total */}
               <div className="cart-total" data-testid="cart-total">
                 <h3>Total</h3>
                 <p>${getTotalPrice().toFixed(2)}</p>
               </div>
 
+              {/* Cart Buttons */}
               <div className="cart-buttons">
                 <PlaceOrderButtonWithMutation
                   cartItems={cartItems}
@@ -90,6 +119,7 @@ class CartOverlay extends React.Component {
   }
 }
 
+// PlaceOrderButton components remain the same
 class PlaceOrderButtonWithMutation extends React.Component {
   render() {
     const { cartItems, getTotalPrice, clearCart, disabled } = this.props;

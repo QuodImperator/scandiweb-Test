@@ -4,14 +4,13 @@ import { GET_PRODUCT } from './queries';
 import { CartConsumer } from './CartContext';
 import { WithRouter } from './WithRouter';
 import HTMLParser from './HTMLParser';
+import ImageCarousel from './ImageCarousel';
 
 class ProductDetailsContent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedAttributes: this.getInitialSelectedAttributes(),
-      selectedImageIndex: 0,
-      isHoveringImage: false
+      selectedAttributes: this.getInitialSelectedAttributes()
     };
   }
 
@@ -97,29 +96,15 @@ class ProductDetailsContent extends React.Component {
 
   render() {
     const { product } = this.props;
-    const { selectedImageIndex, selectedAttributes } = this.state;
+    const { selectedAttributes } = this.state;
     const isAddToCartDisabled = !product.inStock || !this.areAllAttributesSelected();
 
     return (
       <div className="product-details">
-        <div className="product-gallery" data-testid="product-gallery">
-          <div className="thumbnails">
-            {product.gallery.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`${product.name} thumbnail ${index + 1}`}
-                className={`thumbnail ${selectedImageIndex === index ? 'selected' : ''}`}
-                onClick={() => this.handleThumbnailClick(index)}
-              />
-            ))}
-          </div>
-          <div className="main-image">
-            <img src={product.gallery[selectedImageIndex]} alt={product.name} />
-            <button className="image-scroll-button left" onClick={this.handlePrevImage}>&lt;</button>
-            <button className="image-scroll-button right" onClick={this.handleNextImage}>&gt;</button>
-          </div>
-        </div>
+        <ImageCarousel
+          images={product.gallery}
+          productName={product.name}
+        />
         <div className="product-info">
           <h1 className="product-name">{product.name}</h1>
           <h2 className="product-brand">{product.brand}</h2>
