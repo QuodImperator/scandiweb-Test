@@ -1,27 +1,39 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
 import CartOverlay from './CartOverlay';
 import CartContext from './CartContext';
+import { GET_CATEGORIES } from './queries';
 import cart_icon from './assets/EmptyCart.png';
 
 class Header extends React.Component {
   static contextType = CartContext;
 
   state = {
-    isCartOpen: false
+    isCartOpen: false,
+    categories: []
   };
+
+  componentDidMount() {
+    // Fetch categories from GraphQL
+    this.props.client.query({
+      query: GET_CATEGORIES
+    })
+    .then(result => {
+      this.setState({ categories: result.data.categories });
+    })
+    .catch(error => console.error("Error fetching categories:", error));
+  }
 
   getActiveTab = () => {
-    const path = this.props.location.pathname;
-    if (path.includes('tech')) return 'Tech';
-    if (path.includes('clothes')) return 'Clothes';
-    return 'All';
+    const path = this.props.location.pathname.slice(1); // Remove leading slash
+    return path || 'all';
   };
 
-  handleClick = (e, categoryId, path) => {
+  handleClick = (e, categoryName) => {
     e.preventDefault();
-    this.props.onCategoryChange(categoryId);
-    this.props.navigate(path);
+    this.props.onCategoryChange(categoryName);
+    this.props.navigate(`/${categoryName}`);
   };
 
   toggleCart = (e) => {
@@ -30,7 +42,7 @@ class Header extends React.Component {
   };
 
   render() {
-    const { isCartOpen } = this.state;
+    const { isCartOpen, categories } = this.state;
     const { cartItems } = this.context;
     const activeTab = this.getActiveTab();
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -40,33 +52,18 @@ class Header extends React.Component {
         <header className="main-header">
           <nav>
             <ul>
-              <li>
-                <a
-                  href="/all"
-                  className={`nav-link ${activeTab === 'All' ? 'active' : ''}`}
-                  onClick={(e) => this.handleClick(e, 'all', '/all')}
-                >
-                  ALL
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/clothes"
-                  className={`nav-link ${activeTab === 'Clothes' ? 'active' : ''}`}
-                  onClick={(e) => this.handleClick(e, '2', '/clothes')}
-                >
-                  CLOTHES
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/tech"
-                  className={`nav-link ${activeTab === 'Tech' ? 'active' : ''}`}
-                  onClick={(e) => this.handleClick(e, '3', '/tech')}
-                >
-                  TECH
-                </a>
-              </li>
+              {categories.map(category => (
+                <li key={category.name}>
+                  <Link
+                    to={`/${category.name}`}
+                    className={`nav-link ${activeTab === category.name ? 'active' : ''}`}
+                    onClick={(e) => this.handleClick(e, category.name)}
+                    data-testid={activeTab === category.name ? 'active-category-link' : 'category-link'}
+                  >
+                    {category.name.toUpperCase()}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
           <div className="cart-wrapper">
@@ -91,10 +88,15 @@ class Header extends React.Component {
   }
 }
 
-function HeaderWithRouter(props) {
+function HeaderWithRouterAndApollo(props) {
   const location = useLocation();
   const navigate = useNavigate();
-  return <Header {...props} location={location} navigate={navigate} />;
+  const { loading, error, data, client } = useQuery(GET_CATEGORIES);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading categories</div>;
+
+  return <Header {...props} location={location} navigate={navigate} client={client} />;
 }
 
-export default HeaderWithRouter;
+export default HeaderWithRouterAndApollo;
