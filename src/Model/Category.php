@@ -2,10 +2,10 @@
 
 namespace App\Model;
 
-use PDO;
+use App\Model\Abstract\AbstractModel;
 use InvalidArgumentException;
 
-class Category extends Model
+class Category extends AbstractModel
 {
     public static function all(): array
     {
@@ -15,13 +15,13 @@ class Category extends Model
             error_log('Attempting to fetch categories');
             $categories = $instance->fetchAll("SELECT category_id, name FROM categories");
             error_log('Categories fetched from database: ' . json_encode($categories));
-            return $categories ?: []; // Return an empty array if $categories is null or false
+            return $categories ?: []; 
         } catch (\PDOException $e) {
             error_log('PDOException in Category::all(): ' . $e->getMessage());
-            return []; // Return an empty array on error
+            return []; 
         } catch (\Exception $e) {
             error_log('Exception in Category::all(): ' . $e->getMessage());
-            return []; // Return an empty array on error
+            return []; 
         }
     }
 

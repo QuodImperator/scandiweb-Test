@@ -2,10 +2,10 @@
 
 namespace App\Model;
 
-use PDO;
+use App\Model\Abstract\AbstractModel;
 use InvalidArgumentException;
 
-class CartItem extends Model
+class CartItem extends AbstractModel
 {
     public static function find(int $id): ?array
     {

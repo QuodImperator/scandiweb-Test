@@ -4,7 +4,9 @@ namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use App\Model\Category;
-use App\Model\Attribute;
+use App\Model\Product\ConfigurableProduct;
+use App\Model\Product\SimpleProduct;
+use App\Model\Abstract\AbstractProduct;
 
 class ProductType extends ObjectType
 {
@@ -50,11 +52,22 @@ class ProductType extends ObjectType
                     'attributes' => [
                         'type' => TypeRegistry::listOf(TypeRegistry::attribute()),
                         'resolve' => function ($product) {
-                            return Attribute::getByProductId($product['product_id']);
+                            $productInstance = $this->getProductInstance($product);
+                            $attributes = $productInstance->getAttributes();
+                            error_log("Resolved attributes: " . json_encode($attributes));
+                            return $attributes;
                         }
                     ],
                 ];
             }
         ]);
+    }
+
+    private function getProductInstance(array $product): AbstractProduct
+    {
+        $tempProduct = new ConfigurableProduct($product['product_id']);
+        return $tempProduct->hasAttributes() ? 
+            $tempProduct : 
+            new SimpleProduct($product['product_id']);
     }
 }

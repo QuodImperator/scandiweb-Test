@@ -3,12 +3,16 @@
 namespace App\GraphQL\Resolvers;
 
 use App\Model\Category;
-use App\Model\Product;
 use App\Model\CartItem;
-use App\Model\Order;
-use App\Model\Attribute;
+use App\Model\Product\ConfigurableProduct;
+use App\Model\Product\SimpleProduct;
+use App\Model\Order\StandardOrder;
+use App\Model\Attribute\ColorAttribute;
+use App\Model\Attribute\SizeAttribute;
+use App\Model\Abstract\AbstractProduct;
+use App\Model\Abstract\AbstractModel;
 
-class Resolvers
+class Resolvers extends AbstractModel
 {
     public function getCategories()
     {
@@ -16,16 +20,26 @@ class Resolvers
         try {
             $categories = Category::all();
             error_log('Categories from Category::all(): ' . json_encode($categories));
-            return $categories ?: []; // Return an empty array if $categories is null or false
+            return $categories ?: [];
         } catch (\Exception $e) {
             error_log('Exception in Resolvers::getCategories(): ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-            return []; // Return an empty array on error
+            return [];
         }
     }
 
     public function getCategory($args)
     {
         return Category::find((int)$args['id']);
+    }
+
+    private function getProductInstance(array $product): AbstractProduct
+    {
+        $hasAttributes = !empty($product['attributes']) || 
+                        !empty($product['configurable_attributes']);
+        
+        return $hasAttributes ? 
+            new ConfigurableProduct($product['product_id']) : 
+            new SimpleProduct($product['product_id']);
     }
 
     public function getProducts($rootValue, $args)
@@ -36,28 +50,57 @@ class Resolvers
         } elseif ($categoryId !== null) {
             $categoryId = (int)$categoryId;
         }
-        $products = Product::getProductsWithPrices($categoryId);
 
-        foreach ($products as &$product) {
-            $product['prices'] = array_map(function ($price) {
-                return [
-                    'amount' => (float)$price['amount'],
-                    'currency' => [
-                        'symbol' => $price['symbol'],
-                        'label' => $price['label']
-                    ]
-                ];
-            }, $product['prices']);
+        // Get basic product data
+        $query = "SELECT * FROM products";
+        $params = [];
+        
+        if ($categoryId !== null) {
+            $query .= " WHERE category_id = :category_id";
+            $params['category_id'] = $categoryId;
         }
 
-        return $products;
+        $products = $this->fetchAll($query, $params);
+
+        // Enhance products with type-specific data
+        return array_map(function($product) {
+            $productInstance = $this->getProductInstance($product);
+            $productData = $productInstance->find($product['product_id']);
+            
+            if ($productData) {
+                $productData['prices'] = array_map(function ($price) {
+                    return [
+                        'amount' => (float)$price['amount'],
+                        'currency' => [
+                            'symbol' => $price['symbol'],
+                            'label' => $price['label']
+                        ]
+                    ];
+                }, $productInstance->getPrice());
+            }
+            
+            return $productData;
+        }, $products);
     }
 
     public function getProduct($rootValue, $args)
     {
-        $product = Product::find($args['id']);
-        if ($product) {
-            $product['prices'] = array_map(function ($price) {
+        // First fetch basic product info to determine type
+        $productData = $this->fetch(
+            "SELECT * FROM products WHERE product_id = :id",
+            ['id' => $args['id']]
+        );
+
+        if (!$productData) {
+            return null;
+        }
+
+        // Create appropriate product instance
+        $product = $this->getProductInstance($productData);
+        $fullProductData = $product->find($args['id']);
+
+        if ($fullProductData) {
+            $fullProductData['prices'] = array_map(function ($price) {
                 return [
                     'amount' => (float)$price['amount'],
                     'currency' => [
@@ -65,36 +108,10 @@ class Resolvers
                         'label' => $price['label']
                     ]
                 ];
-            }, $product['prices']);
-            $product['attributes'] = Attribute::getByProductId($product['product_id']);
+            }, $product->getPrice());
         }
-        return $product;
-    }
 
-    public function addToCart($args)
-    {
-        $cartItem = new CartItem();
-        $id = $cartItem->save([
-            'product_id' => $args['productId'],
-            'quantity' => 1,
-            'attribute_values' => array_map(function ($attr) {
-                return ['id' => $attr['id'], 'value' => $attr['value']];
-            }, $args['attributeValues'])
-        ]);
-        return CartItem::find($id);
-    }
-
-    public function removeFromCart($args)
-    {
-        $cartItem = new CartItem();
-        return $cartItem->delete($args['cartItemId']);
-    }
-
-    public function updateCartItemQuantity($args)
-    {
-        $cartItem = new CartItem();
-        $success = $cartItem->update($args['cartItemId'], ['quantity' => $args['quantity']]);
-        return $success ? CartItem::find($args['cartItemId']) : null;
+        return $fullProductData;
     }
 
     public function placeOrder($rootValue, $args)
@@ -102,16 +119,23 @@ class Resolvers
         try {
             error_log('Placing order with args: ' . json_encode($args));
 
-            $order = new Order();
+            $order = new StandardOrder();
             $orderItems = [];
 
             foreach ($args['items'] as $item) {
-                $product = Product::find($item['productId']);
-                if (!$product) {
+                $productData = $this->fetch(
+                    "SELECT * FROM products WHERE product_id = :id",
+                    ['id' => $item['productId']]
+                );
+                
+                if (!$productData) {
                     throw new \Exception('Product not found: ' . $item['productId']);
                 }
 
-                $itemTotal = $product['prices'][0]['amount'] * $item['quantity'];
+                $product = $this->getProductInstance($productData);
+                $fullProductData = $product->find($item['productId']);
+
+                $itemTotal = $product->getPrice()[0]['amount'] * $item['quantity'];
 
                 // Format attribute values for storage
                 $attributes = [];
@@ -123,7 +147,7 @@ class Resolvers
 
                 $orderItems[] = [
                     'product_id' => $item['productId'],
-                    'product_name' => $product['name'],
+                    'product_name' => $fullProductData['name'],
                     'quantity' => $item['quantity'],
                     'paid_amount' => $itemTotal,
                     'currency_code' => 'USD',
@@ -136,7 +160,8 @@ class Resolvers
             $orderData = [
                 'total_amount' => $totalAmount,
                 'currency_code' => 'USD',
-                'status' => 'pending'
+                'status' => 'pending',
+                'items' => $orderItems
             ];
 
             error_log('Creating order with data: ' . json_encode($orderData));
