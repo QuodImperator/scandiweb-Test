@@ -35,30 +35,38 @@ class Header extends React.Component {
     const activeTab = this.getActiveTab();
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
-    const categories = [
-      { id: 'all', path: '/all', name: 'ALL' },
-      { id: '2', path: '/clothes', name: 'CLOTHES' },
-      { id: '3', path: '/tech', name: 'TECH' }
-    ];
-
     return (
       <>
         <header className="main-header">
           <nav>
-            <ul data-testid="category-list">
-              {categories.map(category => (
-                <li key={category.id}>
-                  <a
-                    href={category.path}
-                    className={`nav-link ${activeTab === category.name.charAt(0) + category.name.slice(1).toLowerCase() ? 'active' : ''}`}
-                    onClick={(e) => this.handleClick(e, category.id, category.path)}
-                    data-testid={`category-link-${category.id}`}
-                    aria-current={activeTab === category.name.charAt(0) + category.name.slice(1).toLowerCase() ? 'page' : undefined}
-                  >
-                    {category.name}
-                  </a>
-                </li>
-              ))}
+            <ul>
+              <li>
+                <a
+                  href="/all"
+                  className={`nav-link ${activeTab === 'All' ? 'active' : ''}`}
+                  onClick={(e) => this.handleClick(e, 'all', '/all')}
+                >
+                  ALL
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/clothes"
+                  className={`nav-link ${activeTab === 'Clothes' ? 'active' : ''}`}
+                  onClick={(e) => this.handleClick(e, '2', '/clothes')}
+                >
+                  CLOTHES
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/tech"
+                  className={`nav-link ${activeTab === 'Tech' ? 'active' : ''}`}
+                  onClick={(e) => this.handleClick(e, '3', '/tech')}
+                >
+                  TECH
+                </a>
+              </li>
             </ul>
           </nav>
           <div className="cart-wrapper">
