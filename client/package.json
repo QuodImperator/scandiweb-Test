@@ -2,6 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/public/build",
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@testing-library/jest-dom": "^6.5.0",

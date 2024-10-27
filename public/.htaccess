@@ -1,15 +1,6 @@
 <IfModule mod_rewrite.c>
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
-
     RewriteEngine On
-
-    # Redirect Trailing Slashes If Not A Folder...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
-
+    
     # Handle Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -18,8 +9,13 @@
     # Handle CORS
     <IfModule mod_headers.c>
         Header set Access-Control-Allow-Origin "http://localhost:3000"
+        Header set Access-Control-Allow-Origin "http://darko-site.rf.gd"
         Header set Access-Control-Allow-Methods "POST, GET, OPTIONS"
         Header set Access-Control-Allow-Headers "Content-Type, Authorization"
         Header set Access-Control-Allow-Credentials "true"
     </IfModule>
 </IfModule>
+
+# PHP Error Reporting for debugging
+php_flag display_errors on
+php_value error_reporting E_ALL

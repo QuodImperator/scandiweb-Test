@@ -1,8 +1,7 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
 const httpLink = createHttpLink({
-    // For local development
-    uri: 'http://localhost:8080/graphql',
+    uri: 'http://localhost:3000',
     credentials: 'include',
     headers: {
         'Content-Type': 'application/json'

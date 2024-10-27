@@ -7,14 +7,40 @@ import { CartProvider } from './CartContext';
 
 class App extends React.Component {
   state = {
-    selectedCategory: 'all'
+    selectedCategory: 'all',
+    isLoading: true,
+    error: null
   };
 
+  componentDidMount() {
+    console.log('App mounted');
+    this.setState({ isLoading: false });
+  }
+
+  componentDidCatch(error, info) {
+    console.error('App error:', error);
+    console.error('Error info:', info);
+    this.setState({ error: error });
+  }
+
   handleCategoryChange = (categoryId) => {
+    console.log('Category changed to:', categoryId);
     this.setState({ selectedCategory: categoryId });
   };
 
   render() {
+    if (this.state.isLoading) {
+      return <div style={{ padding: '20px' }}>Loading...</div>;
+    }
+
+    if (this.state.error) {
+      return (
+        <div style={{ padding: '20px', color: 'red' }}>
+          Error: {this.state.error.toString()}
+        </div>
+      );
+    }
+
     return (
       <CartProvider>
         <Router>
