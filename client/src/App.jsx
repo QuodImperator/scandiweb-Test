@@ -14,6 +14,7 @@ class App extends React.Component {
 
   componentDidMount() {
     console.log('App mounted');
+    this.handleCategoryChange('all');
     this.setState({ isLoading: false });
   }
 

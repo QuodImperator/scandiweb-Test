@@ -5,7 +5,8 @@ const CartContext = React.createContext();
 export class CartProvider extends React.Component {
   state = {
     cartItems: [],
-    isLoading: true
+    isLoading: true,
+    isCartOpen: false
   };
 
   componentDidMount() {
@@ -115,6 +116,12 @@ export class CartProvider extends React.Component {
     return this.state.cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
+  toggleCart = () => {
+    this.setState(prevState => ({
+      isCartOpen: !prevState.isCartOpen
+    }));
+  };
+
   render() {
     if (this.state.isLoading) {
       return null;
@@ -122,6 +129,8 @@ export class CartProvider extends React.Component {
 
     const value = {
       cartItems: this.state.cartItems,
+      isCartOpen: this.state.isCartOpen,
+      toggleCart: this.toggleCart,         
       addToCart: this.addToCart,
       removeFromCart: this.removeFromCart,
       updateItemQuantity: this.updateItemQuantity,

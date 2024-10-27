@@ -7,9 +7,13 @@ import cart_icon from './assets/EmptyCart.png';
 class Header extends React.Component {
   static contextType = CartContext;
 
-  state = {
-    isCartOpen: false
-  };
+  state = {};
+
+  componentDidMount() {
+    if (this.props.location.pathname === '/' || this.props.location.pathname === '/all' || this.props.location.pathname === "/public/build/") {
+      this.handleClick(new Event('click'), 'all', '/all');
+    }
+  }
 
   getActiveTab = () => {
     const path = this.props.location.pathname;
@@ -19,7 +23,7 @@ class Header extends React.Component {
   };
 
   handleClick = (e, categoryId, path) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     this.props.onCategoryChange(categoryId);
     this.props.navigate(path);
   };
@@ -30,8 +34,7 @@ class Header extends React.Component {
   };
 
   render() {
-    const { isCartOpen } = this.state;
-    const { cartItems } = this.context;
+    const { cartItems, isCartOpen, toggleCart } = this.context;
     const activeTab = this.getActiveTab();
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
@@ -64,7 +67,7 @@ class Header extends React.Component {
           </nav>
           <div className="cart-wrapper">
             <button
-              onClick={this.toggleCart}
+              onClick={toggleCart}
               data-testid="cart-btn"
               className="cart-icon-button"
             >
@@ -75,8 +78,8 @@ class Header extends React.Component {
         </header>
         {isCartOpen && (
           <>
-            <CartOverlay isOpen={isCartOpen} onClose={this.toggleCart} />
-            <div className="cart-overlay-wrapper" onClick={this.toggleCart}></div>
+            <CartOverlay isOpen={isCartOpen} onClose={toggleCart} />
+            <div className="cart-overlay-wrapper" onClick={toggleCart}></div>
           </>
         )}
       </>

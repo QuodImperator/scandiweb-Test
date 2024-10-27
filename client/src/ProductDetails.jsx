@@ -49,26 +49,6 @@ class ProductDetailsContent extends React.Component {
     }));
   };
 
-  handleThumbnailClick = (index) => {
-    this.setState({ selectedImageIndex: index });
-  };
-
-  handlePrevImage = () => {
-    this.setState(prevState => ({
-      selectedImageIndex: (prevState.selectedImageIndex - 1 + this.props.product.gallery.length) % this.props.product.gallery.length
-    }));
-  };
-
-  handleNextImage = () => {
-    this.setState(prevState => ({
-      selectedImageIndex: (prevState.selectedImageIndex + 1) % this.props.product.gallery.length
-    }));
-  };
-
-  handleImageHover = (isHovering) => {
-    this.setState({ isHoveringImage: isHovering });
-  }
-
   areAllAttributesSelected = () => {
     const { product } = this.props;
     const { selectedAttributes } = this.state;
@@ -76,10 +56,9 @@ class ProductDetailsContent extends React.Component {
   }
 
   handleAddToCart = () => {
-    const { product, addToCart } = this.props;
+    const { product, addToCart, toggleCart } = this.props;
     const { selectedAttributes } = this.state;
 
-    // Convert selectedAttributes to the format expected by the cart
     const cartAttributes = Object.keys(selectedAttributes).reduce((acc, attributeId) => {
       const attribute = product.attributes.find(attr => attr.id === attributeId);
       if (attribute) {
@@ -92,6 +71,24 @@ class ProductDetailsContent extends React.Component {
     }, {});
 
     addToCart(product, cartAttributes);
+    if (toggleCart) {
+      toggleCart();
+    }
+  }
+
+  generateAttributeTestId = (attribute, item) => {
+    const attributeName = attribute.name.toLowerCase();
+    let itemValue = item.value;
+    
+    // Handle specific formats for color values
+    if (attributeName === 'color') {
+      // If it starts with #, it's a hex color
+      if (itemValue.startsWith('#')) {
+        itemValue = itemValue.toUpperCase();
+      }
+    }
+
+    return `product-attribute-${attributeName}-${itemValue}`;
   }
 
   render() {
@@ -101,10 +98,13 @@ class ProductDetailsContent extends React.Component {
 
     return (
       <div className="product-details">
-        <ImageCarousel
-          images={product.gallery}
-          productName={product.name}
-        />
+        <div className="product-gallery-container">
+          <ImageCarousel
+            images={product.gallery}
+            productName={product.name}
+          />
+        </div>
+        
         <div className="product-info">
           <h1 className="product-name">{product.name}</h1>
           <h2 className="product-brand">{product.brand}</h2>
@@ -117,22 +117,17 @@ class ProductDetailsContent extends React.Component {
             >
               <h3>{attribute.name}:</h3>
               <div className="attribute-options">
-                {attribute.items.map(item => {
-                  const value = attribute.type === 'swatch' ? item.value : item.displayValue;
-                  const testId = `product-attribute-${attribute.name.toLowerCase()}-${value.toLowerCase().replace('#', '')}`;
-
-                  return (
-                    <button
-                      key={item.id}
-                      className={`attribute-option ${selectedAttributes[attribute.id] === item.id ? 'selected' : ''}`}
-                      onClick={() => this.handleAttributeChange(attribute.id, item.id)}
-                      style={attribute.type === 'swatch' ? { backgroundColor: item.value } : {}}
-                      data-testid={testId}
-                    >
-                      {attribute.type === 'swatch' ? '' : item.displayValue}
-                    </button>
-                  );
-                })}
+                {attribute.items.map(item => (
+                  <button
+                    key={item.id}
+                    className={`attribute-option ${selectedAttributes[attribute.id] === item.id ? 'selected' : ''}`}
+                    onClick={() => this.handleAttributeChange(attribute.id, item.id)}
+                    style={attribute.type === 'swatch' ? { backgroundColor: item.value } : {}}
+                    data-testid={this.generateAttributeTestId(attribute, item)}
+                  >
+                    {attribute.type === 'swatch' ? '' : item.displayValue}
+                  </button>
+                ))}
               </div>
             </div>
           ))}
@@ -153,7 +148,10 @@ class ProductDetailsContent extends React.Component {
             {product.inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
 
-          <div className="product-description" data-testid="product-description">
+          <div
+            className="product-description"
+            data-testid="product-description"
+          >
             <HTMLParser html={product.description} />
           </div>
         </div>
@@ -177,7 +175,7 @@ class ProductDetails extends React.Component {
     return (
       <Query query={GET_PRODUCT} variables={{ id }}>
         {({ loading, error, data }) => {
-          if (loading) return <div className="loading"></div>;
+          if (loading) return <div className="loading">Loading...</div>;
           if (error) return <div className="error">Error: {error.message}</div>;
 
           const product = data.product;
@@ -185,8 +183,13 @@ class ProductDetails extends React.Component {
 
           return (
             <CartConsumer>
-              {({ addToCart, cartItems }) => (
-                <ProductDetailsContent product={product} addToCart={addToCart} cartItems={cartItems} />
+              {({ addToCart, cartItems, toggleCart }) => (
+                <ProductDetailsContent 
+                  product={product} 
+                  addToCart={addToCart} 
+                  cartItems={cartItems}
+                  toggleCart={toggleCart}
+                />
               )}
             </CartConsumer>
           );
