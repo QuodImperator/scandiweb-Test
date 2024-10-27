@@ -113,20 +113,26 @@ class ProductDetailsContent extends React.Component {
             <div
               key={attribute.id}
               className="product-attribute"
-              data-testid={`product-attribute-${attribute.name.toLowerCase().replace(/\s+/g, '-')}`}
+              data-testid={`product-attribute-${attribute.name.toLowerCase()}`}
             >
               <h3>{attribute.name}:</h3>
               <div className="attribute-options">
-                {attribute.items.map(item => (
-                  <button
-                    key={item.id}
-                    className={`attribute-option ${selectedAttributes[attribute.id] === item.id ? 'selected' : ''}`}
-                    onClick={() => this.handleAttributeChange(attribute.id, item.id)}
-                    style={attribute.type === 'swatch' ? { backgroundColor: item.value } : {}}
-                  >
-                    {attribute.type === 'swatch' ? '' : item.displayValue}
-                  </button>
-                ))}
+                {attribute.items.map(item => {
+                  const value = attribute.type === 'swatch' ? item.value : item.displayValue;
+                  const testId = `product-attribute-${attribute.name.toLowerCase()}-${value.toLowerCase().replace('#', '')}`;
+
+                  return (
+                    <button
+                      key={item.id}
+                      className={`attribute-option ${selectedAttributes[attribute.id] === item.id ? 'selected' : ''}`}
+                      onClick={() => this.handleAttributeChange(attribute.id, item.id)}
+                      style={attribute.type === 'swatch' ? { backgroundColor: item.value } : {}}
+                      data-testid={testId}
+                    >
+                      {attribute.type === 'swatch' ? '' : item.displayValue}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -147,10 +153,7 @@ class ProductDetailsContent extends React.Component {
             {product.inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
 
-          <div
-            className="product-description"
-            data-testid="product-description"
-          >
+          <div className="product-description" data-testid="product-description">
             <HTMLParser html={product.description} />
           </div>
         </div>

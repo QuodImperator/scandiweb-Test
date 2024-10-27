@@ -21,7 +21,7 @@ class CartOverlay extends React.Component {
     return (
       <CartConsumer>
         {({ cartItems, removeFromCart, updateItemQuantity, updateItemAttributes, getTotalPrice, clearCart }) => (
-          <div className="cart-overlay active">
+          <div className="cart-overlay active" data-testid="cart-overlay">
             <div className="cart-content">
               <h2>My Bag, {cartItems.length === 1 ? '1 item' : `${cartItems.length} items`}</h2>
               {cartItems.map((item) => (

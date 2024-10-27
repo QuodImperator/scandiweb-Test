@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
 const httpLink = createHttpLink({
-    uri: 'http://localhost:3000',
+    uri: 'https://darko-site.rf.gd/graphql',
     credentials: 'include',
     headers: {
         'Content-Type': 'application/json'

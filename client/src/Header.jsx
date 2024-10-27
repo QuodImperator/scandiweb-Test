@@ -52,6 +52,9 @@ class Header extends React.Component {
                     href={category.path}
                     className={`nav-link ${activeTab === category.name.charAt(0) + category.name.slice(1).toLowerCase() ? 'active' : ''}`}
                     onClick={(e) => this.handleClick(e, category.id, category.path)}
+                    data-testid={activeTab === category.name.charAt(0) + category.name.slice(1).toLowerCase() 
+                      ? 'active-category-link' 
+                      : 'category-link'}
                   >
                     {category.name}
                   </a>

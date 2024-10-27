@@ -41,7 +41,7 @@ class ImageCarousel extends React.Component {
     const { activeIndex, isHovered } = this.state;
 
     return (
-      <div className="product-gallery">
+      <div className="product-gallery" data-testid="product-gallery">
         {/* Thumbnails */}
         <div className="thumbnails">
           {images.map((image, index) => (
