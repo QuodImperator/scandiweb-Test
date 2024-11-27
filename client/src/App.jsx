@@ -50,6 +50,8 @@ class App extends React.Component {
             <div className="main-content">
               <Routes>
                 <Route path="/" element={<Navigate to="/all" replace />} />
+                <Route path="/public/build" element={<Navigate to="/all" replace />} />
+                <Route path="/public/build/*" element={<Navigate to="/all" replace />} />
                 <Route path="/all" element={<ProductGrid categoryId="all" />} />
                 <Route path="/clothes" element={<ProductGrid categoryId="2" />} />
                 <Route path="/tech" element={<ProductGrid categoryId="3" />} />
