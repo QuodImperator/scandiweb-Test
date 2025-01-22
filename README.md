@@ -1,6 +1,6 @@
 # Scandiweb E-commerce Application
 
-A full-stack e-commerce application built with React and PHP, featuring a GraphQL API.
+A full-stack e-commerce application built with React and PHP, featuring a GraphQL API, hosted [here]([url](https://darko-site.rf.gd)).
 
 ## Features
 
